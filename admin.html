@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        h1{
+            text-align: center;
+            color:antiquewhite;
+            font-size: 50px;
+        }
+        p{
+            font-size:30px;
+        }
+        button{
+            color:white;
+            margin:10px;
+            border-radius: 20px;
+        }
+        button:hover{
+            background-color: rgb(7, 18, 28);
+            color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <p>Welcome to the admin panel!</p>
+    <div class="admin-panel">
+        <button class="upload"><a href="upload.php">Upload</a></button><br>
+        <button class="delete"><a href="delete.php">Delete</a></button><br>
+        <button class="update"><a href="update.php">Update</a></button><br>
+        <button class="view"><a href="view.php">View</a></button><br>
+        <button class="logout"><a href="logout.php">Logout</a></button>
+    </div>
+</body>
+</html>
