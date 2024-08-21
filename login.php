@@ -24,6 +24,7 @@
       width: 300px;
       text-align: center;
       animation: fadeIn 1s ease-in-out;
+      margin:100px;
     }
 
     .login-container h2 {
@@ -101,6 +102,7 @@
   </style>
 </head>
 <body>
+  <?php include('header.php');?>
   <div class="login-container">
     <h2 id="typing-header">Hey There!<br>Welcome Back.</h2>
     <form method="POST" action="">

@@ -103,6 +103,7 @@
 </head>
 
 <body>
+	<?php include('header.php');?>
 	<div id="content">
 		<h2>Create an Account</h2>
 		<form method="POST" action="register.php" enctype="multipart/form-data">

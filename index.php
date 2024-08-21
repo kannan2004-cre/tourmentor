@@ -1,6 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php include('header.php');?>
+<?php include('header.php'); ?>
+<style>
+
+.message-form {
+    display: flex;
+    flex-direction: column;
+    margin:30px;
+}
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.input-group input {
+    width: 48%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f0f4ff;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+textarea {
+    resize: none;
+}
+
+button[type="submit"] {
+    background-color: #CE1212;
+    color: white;
+    padding: 12px 24px;
+    margin:20px 0;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #b51010;
+}
+</style>
+
 <body>
 
   <!-- ======= Header ======= -->
@@ -10,7 +63,7 @@
       <a href="index.php" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <img src="assets/img/tourlogo.png" alt="">
-        <h1>Tourmentor<span>.</span></h1> 
+        <h1>Tourmentor<span>.</span></h1>
       </a>
 
       <nav id="navbar" class="navbar">
@@ -237,10 +290,10 @@
             </div>
           </div> End Starter Menu Content -->
 
-          
-        </div>
 
-      </div>
+    </div>
+
+    </div>
     </section><!-- End Menu Section -->
     <!-- ======= Gallery Section ======= -->
     <section id="gallery" class="gallery section-bg">
@@ -327,34 +380,21 @@
 
         </div>
 
-        <form action="forms/contact.php" method="post" role="form" class="php-email-form p-3 p-md-4">
-          <div class="row">
-            <div class="col-xl-6 form-group">
-              <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+        <div class="container">
+          <form action="./forms/contact.php" method="post" class="message-form">
+            <div class="input-group">
+              <input type="text" name="name" placeholder="Your Name" required>
+              <input type="email" name="email" placeholder="Your Email" required>
             </div>
-            <div class="col-xl-6 form-group">
-              <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" required>
-          </div>
-          <div class="form-group">
-            <textarea class="form-control" name="message" rows="5" placeholder="Message" required></textarea>
-          </div>
-          <div class="my-3">
-            <div class="loading">Loading</div>
-            <div class="error-message"></div>
-            <div class="sent-message">Your message has been sent. Thank you!</div>
-          </div>
-          <div class="text-center"><button type="submit">Send Message</button></div>
-        </form><!--End Contact Form -->
-
-      </div>
+            <input type="text" name="subject" placeholder="Subject" required>
+            <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+            <button type="submit">Submit review</button>
+          </form>
+        </div>
     </section><!-- End Contact Section -->
 
   </main><!-- End #main -->
-<?php include('footer.php')?>
+  <?php include('footer.php') ?>
 </body>
 
 </html>

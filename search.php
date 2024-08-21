@@ -15,7 +15,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 20px 0;
+        margin: 140px;
         padding: 0 10px;
     }
 
@@ -140,7 +140,7 @@
     }
 </style>
 <body>
-    <?php include 'header.php'; ?>
+    <?php include('header.php');?>
     <form method="POST" action="">
         <input type="text" name="query" placeholder="Enter your destination">
         <button type="submit" name="search">Search</button>
