@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<?php include('header.php'); ?>
 <style>
 
 .message-form {
@@ -55,37 +54,7 @@ button[type="submit"]:hover {
 </style>
 
 <body>
-
-  <!-- ======= Header ======= -->
-  <header id="header" class="header fixed-top d-flex align-items-center">
-    <div class="container d-flex align-items-center justify-content-between">
-
-      <a href="index.php" class="logo d-flex align-items-center me-auto me-lg-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <img src="assets/img/tourlogo.png" alt="">
-        <h1>Tourmentor<span>.</span></h1>
-      </a>
-
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a href="#hero">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#why-us">Features</a></li>
-          <!--<li><a href="#menu">Top Places</a></li>-->
-          <li><a href="search.php">search</a></li>
-          <li><a href="#gallery">Gallery</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><a href="admin.html">Admin</a></li>
-          <li><a href="login.php">Login</a></li>
-
-        </ul>
-      </nav><!-- .navbar -->
-      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-
-    </div>
-  </header><!-- End Header -->
-
+  <?php include('header.php');?>
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="hero d-flex align-items-center section-bg">
     <div class="container">

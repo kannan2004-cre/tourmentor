@@ -10,6 +10,7 @@
         background-color: #F9F9F9;
         color: #333;
     }
+    
 
     form {
         display: flex;

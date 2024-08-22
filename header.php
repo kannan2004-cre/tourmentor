@@ -38,12 +38,7 @@
       <nav id="navbar" class="navbar">
         <ul>
           <li><a href="index.php">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#why-us">Features</a></li>
-          <!--<li><a href="#menu">Top Places</a></li>-->
           <li><a href="search.php">search</a></li>
-          <li><a href="#gallery">Gallery</a></li>
-          <li><a href="#contact">Contact</a></li>
           <li><a href="admin.html">Admin</a></li>
           <li><a href="login.php">Login</a></li>
 
