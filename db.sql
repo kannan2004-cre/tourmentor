@@ -31,3 +31,12 @@ create table userreg(name varchar(500),
     password varchar(500),
     filename varchar(500)
 );
+
+/*REVIEW TABLE*/
+create table reviews(
+    id int AUTO_INCREMENT primary key,
+    name varchar(100) not null,
+    email varchar(100) not null,
+    title varchar(255) not null,
+    review text not null,
+);
