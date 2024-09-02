@@ -40,6 +40,7 @@
           <li><a href="index.php">Home</a></li>
           <li><a href="search.php">search</a></li>
           <li><a href="admin.html">Admin</a></li>
+          <li><a href="profile.php">Profile</a></li>
           <li><a href="login.php">Login</a></li>
 
         </ul>

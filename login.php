@@ -1,3 +1,27 @@
+<?php
+if (isset($_POST['submit'])) {
+  $email = $_POST['email'];
+  $password = $_POST['pass'];
+  $conn = mysqli_connect("localhost", "root", "", "tourmentor");
+  if (!$conn) {
+    die("connection failed");
+  }
+  $sql = "SELECT * FROM userreg WHERE email = '$email'";
+  $result = mysqli_query($conn, $sql);
+  if (mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    if (password_verify($password, $row['password'])) {
+      echo "<script>alert('Welcome to Tourmentor!');</script>";
+      header("Location: index.php");
+    } else {
+      echo "<script>alert('Invalid password');</script>";
+    }
+  } else {
+    echo "<script>alert('Invalid email');</script>";
+  }
+  mysqli_close($conn);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,10 +58,10 @@
     .login-container h2 {
       margin-bottom: 20px;
       color: #333;
-      
+
       overflow: hidden;
       white-space: nowrap;
-      
+
       animation: typing 3s steps(30, end), blink-caret 0.5s step-end infinite;
     }
 
@@ -95,7 +119,7 @@
     .login-container a {
       display: block;
       margin-top: 10px;
-      color:black;
+      color: black;
       /* Orange text */
       text-decoration: none;
       font-size: 14px;
@@ -224,33 +248,6 @@
     <a href="#">Forgot Password?</a>
     <a href="signup.php">Don't have an account?Sign Up</a>
   </div>
-
-  <?php
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  error_reporting(E_ALL);
-  if (isset($_POST['submit'])) {
-    $email = $_POST['email'];
-    $password = $_POST['pass'];
-    $conn = mysqli_connect("localhost", "root", "", "tourmentor");
-    if (!$conn) {
-      die("connection failed");
-    }
-    $sql = "SELECT * FROM userreg WHERE email = '$email'";
-    $result = mysqli_query($conn, $sql);
-    if (mysqli_num_rows($result) > 0) {
-      $row = mysqli_fetch_assoc($result);
-      if (password_verify($password, $row['password'])) {
-        header("Location: index.php");
-      } else {
-        echo "<script>alert('Invalid password');</script>";
-      }
-    } else {
-      echo "<script>alert('Invalid email');</script>";
-    }
-    mysqli_close($conn);
-  }
-  ?>
 </body>
 
 </html>
