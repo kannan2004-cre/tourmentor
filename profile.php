@@ -78,6 +78,12 @@
             color: #ededed;
             font-size: 20px;
         }
+
+        .buttons a:hover{
+            background-color: #ffa600;
+            border-color: #ffa600;
+            color: black;
+        }
     </style>
 </head>
 

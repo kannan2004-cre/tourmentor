@@ -60,8 +60,8 @@ button[type="submit"]:hover {
     <div class="container">
       <div class="row justify-content-between gy-5">
         <div class="col-lg-5 order-2 order-lg-1 d-flex flex-column justify-content-center align-items-center align-items-lg-start text-center text-lg-start">
-          <h2 data-aos="fade-up">Lorem ipsum<br>see amor</h2>
-          <p data-aos="fade-up" data-aos-delay="100">Sed autem laudantium dolores. Voluptatem itaque ea consequatur eveniet. Eum quas beatae cumque eum quaerat.</p>
+          <h2 data-aos="fade-up">Welcome to<br>Tourmentor</h2>
+          <p data-aos="fade-up" data-aos-delay="100">Your ultimate Tour Guru.</p>
           <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
           </div>
         </div>
