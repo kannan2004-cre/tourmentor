@@ -1,3 +1,38 @@
+<?php
+if (isset($_POST['submit'])) {
+    $filename = $_FILES["profilepic"]["name"];
+    $tempname = $_FILES["profilepic"]["tmp_name"];
+    $folder = "./uimages/" . $filename;
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['pass'];
+    $conn = mysqli_connect("localhost", "root", "", "tourmentor");
+    if (!$conn) {
+        die("connection failed");
+    }
+    if (strlen($password) < 8 || !preg_match("/[0-9]/", $password)  || !preg_match("/[\W]/", $password) ) {
+        echo "<script>alert('Password must be at least 8 characters long and include at least one number.');</script>";
+        exit(0);
+    } else {
+        $hpass = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO userreg (`name`, `email`, `password`,`filename`) VALUES ('$name', '$email', '$hpass','$filename')";
+        if ((mysqli_query($conn, $sql)) && (move_uploaded_file($tempname, $folder))) {
+            echo "<script>alert('registered successfully')</script>";
+            header("Location: index.php");
+        } else {
+            echo "<script>alert('OOPS! Registration failed');</script>";
+        }
+        /*if(mysqli_query($conn,$sql)){
+        echo "<script>alert('registered successfully')</script>";
+    }
+    else{
+        echo "<script>alert('OOPS! Registration failed');</script>";
+    }
+    mysqli_close($conn);*/
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,14 +49,16 @@
 			height: 100vh;
 			margin: 0;
 			font-family: Arial, sans-serif;
-			background-color: #fff7e6; /* Light orange background */
+			background-color: #fff7e6;
+			/* Light orange background */
 		}
 
 		#content {
 			background-color: #fff;
 			padding: 20px;
 			border-radius: 10px;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			/* Light shadow effect */
 			width: 100%;
 			max-width: 500px;
 			text-align: center;
@@ -31,7 +68,8 @@
 
 		#content h2 {
 			margin-bottom: 20px;
-			color: #333; /* Dark text color */
+			color: #333;
+			/* Dark text color */
 		}
 
 		.details {
@@ -61,7 +99,8 @@
 		.form-group input[type="file"] {
 			flex-grow: 1;
 			padding: 8px;
-			border: 2px solid #ffa500; /* Orange border */
+			border: 2px solid #ffa500;
+			/* Orange border */
 			border-radius: 5px;
 			font-size: 14px;
 		}
@@ -69,7 +108,8 @@
 		.btn-primary {
 			width: 100%;
 			padding: 10px;
-			background-color: #ffa500; /* Orange background */
+			background-color: #ffa500;
+			/* Orange background */
 			border: none;
 			border-radius: 5px;
 			color: white;
@@ -79,7 +119,8 @@
 		}
 
 		.btn-primary:hover {
-			background-color: #e69500; /* Darker orange on hover */
+			background-color: #e69500;
+			/* Darker orange on hover */
 		}
 
 		@keyframes fadeIn {
@@ -87,6 +128,7 @@
 				opacity: 0;
 				transform: translateY(-20px);
 			}
+
 			to {
 				opacity: 1;
 				transform: translateY(0);
@@ -97,16 +139,102 @@
 		.form-group input:focus,
 		.btn-primary:focus {
 			outline: none;
-			box-shadow: 0 0 10px #ffa500; /* Orange glow effect */
+			box-shadow: 0 0 10px #ffa500;
+			/* Orange glow effect */
+		}
+
+		.circle {
+			position: fixed;
+			border-radius: 50%;
+			background: #ffa600;
+			animation: ripple 20s infinite;
+			box-shadow: 0px 0px 1px 0px #508fb9;
+			pointer-events: none;
+		}
+
+		.small {
+			width: 200px;
+			height: 200px;
+			left: -100px;
+			bottom: -100px;
+		}
+
+		.medium {
+			width: 400px;
+			height: 400px;
+			left: -200px;
+			bottom: -200px;
+		}
+
+		.large {
+			width: 600px;
+			height: 600px;
+			left: -300px;
+			bottom: -300px;
+		}
+
+		.xlarge {
+			width: 800px;
+			height: 800px;
+			left: -400px;
+			bottom: -400px;
+		}
+
+		.xxlarge {
+			width: 1000px;
+			height: 1000px;
+			left: -500px;
+			bottom: -500px;
+		}
+
+		.shade1 {
+			opacity: 0.2;
+		}
+
+		.shade2 {
+			opacity: 0.5;
+		}
+
+		.shade3 {
+			opacity: 0.7;
+		}
+
+		.shade4 {
+			opacity: 0.8;
+		}
+
+		.shade5 {
+			opacity: 0.9;
+		}
+
+		@keyframes ripple {
+			0% {
+				transform: scale(0.8);
+			}
+
+			50% {
+				transform: scale(1.2);
+			}
+
+			100% {
+				transform: scale(0.8);
+			}
 		}
 	</style>
 </head>
 
 <body>
-	<?php include('header.php');?>
+	<?php include('header.php'); ?>
+	<div class="ripple-background">
+		<div class="circle xxlarge shade1"></div>
+		<div class="circle xlarge shade2"></div>
+		<div class="circle large shade3"></div>
+		<div class="circle medium shade4"></div>
+		<div class="circle small shade5"></div>
+	</div>
 	<div id="content">
 		<h2>Create an Account</h2>
-		<form method="POST" action="register.php" enctype="multipart/form-data">
+		<form method="POST" action="" enctype="multipart/form-data">
 			<div class="details">
 				<div class="form-group">
 					<label for="name">Name:</label>
@@ -122,16 +250,16 @@
 				</div>
 				<div class="form-group">
 					<label for="profilepic">Profile Picture:</label>
-					<input type="file" id="profilepic" name="profilepic" value="" required />
+					<input type="file" id="profilepic" name="profilepic" value="">
 				</div>
 			</div>
 			<div class="form-group">
 				<button class="btn btn-primary" type="submit" name="submit">SIGNUP</button>
 			</div>
-      <a href="login.php">Already have an account? Login</a>
+			<a href="login.php">Already have an account? Login</a>
 		</form>
 	</div
-	</div>
+		</div>
 </body>
 
 </html>

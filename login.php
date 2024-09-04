@@ -2,26 +2,37 @@
 if (isset($_POST['submit'])) {
   $email = $_POST['email'];
   $password = $_POST['pass'];
-  $conn = mysqli_connect("localhost", "root", "", "tourmentor");
-  if (!$conn) {
-    die("connection failed");
-  }
-  $sql = "SELECT * FROM userreg WHERE email = '$email'";
-  $result = mysqli_query($conn, $sql);
-  if (mysqli_num_rows($result) > 0) {
-    $row = mysqli_fetch_assoc($result);
-    if (password_verify($password, $row['password'])) {
-      echo "<script>alert('Welcome to Tourmentor!');</script>";
-      header("Location: index.php");
-    } else {
-      echo "<script>alert('Invalid password');</script>";
-    }
+
+  // Password validation
+  if (strlen($password) < 8 || !preg_match("/[0-9]/", $password) /* || !preg_match("/[\W]/", $password) */) {
+    echo "<script>alert('Password must be at least 8 characters long and include at least one number.');</script>";
   } else {
-    echo "<script>alert('Invalid email');</script>";
+    $conn = mysqli_connect("localhost", "root", "", "tourmentor");
+    if (!$conn) {
+      die("connection failed");
+    }
+
+    $sql = "SELECT * FROM userreg WHERE email = '$email'";
+    $result = mysqli_query($conn, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+      $row = mysqli_fetch_assoc($result);
+      if (password_verify($password, $row['password'])) {
+        echo "<script>alert('Welcome to Tourmentor!');</script>";
+        header("Location: index.php");
+        exit();
+      } else {
+        echo "<script>alert('Invalid password');</script>";
+      }
+    } else {
+      echo "<script>alert('Invalid email');</script>";
+    }
+
+    mysqli_close($conn);
   }
-  mysqli_close($conn);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -155,6 +166,7 @@ if (isset($_POST['submit'])) {
       background: #ffa600;
       animation: ripple 20s infinite;
       box-shadow: 0px 0px 1px 0px #508fb9;
+      pointer-events: none;
     }
 
     .small {
