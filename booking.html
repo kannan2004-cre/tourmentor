@@ -61,11 +61,18 @@
             margin-top: 160px;
             max-width: 150%;
         }
+
+        #search-hotels-btn {
+            height: 30px;
+            width: 140px;
+            margin-top: 220px;
+            display: flex;
+
+        }
     </style>
 </head>
 
 <body>
-    <?php include('header.php'); ?>
     <div class="booking-conatiner">
         <form action="">
             <div class="dropdown">
@@ -123,8 +130,10 @@
                     </label>
                 </div>
                 <div id="attractions-container" style="display: none;"></div>
-            </div>
 
+                <button type="button" id="search-hotels-btn" onclick="searchHotels()">Search Hotels</button>
+                <div id="hotels-container"></div>
+            </div>
         </form>
     </div>
     <script>
@@ -740,10 +749,11 @@
             ]
         };
 
-       
+
+        // Function to create checkboxes for attractions
         function createCheckboxes(attractions) {
             const container = document.getElementById('attractions-container');
-            container.innerHTML = ''; 
+            container.innerHTML = '';
 
             attractions.forEach(attraction => {
                 const checkbox = document.createElement('input');
@@ -756,17 +766,17 @@
                 label.htmlFor = attraction;
                 label.textContent = attraction;
 
-                const br = document.createElement('br'); 
+                const br = document.createElement('br');
 
                 container.appendChild(checkbox);
                 container.appendChild(label);
                 container.appendChild(br);
             });
 
-            
             container.style.display = 'block';
         }
 
+        // Function to handle district selection
         function updateAttractions() {
             const districtDropdown = document.getElementById('districtdropdown');
             const selectedDistrict = districtDropdown.value;
@@ -778,27 +788,25 @@
                 if (attractions) {
                     createCheckboxes(attractions);
                 } else {
-                    console.error('No attractions found for district:', selectedDistrict); 
+                    console.error('No attractions found for district:', selectedDistrict);
                     document.getElementById('attractions-container').style.display = 'none';
                 }
             } else {
-                document.getElementById('attractions-container').style.display = 'none'; 
+                document.getElementById('attractions-container').style.display = 'none';
             }
         }
 
-        
         document.getElementById('districtdropdown').addEventListener('change', updateAttractions);
 
-        
         function updateDistricts() {
             const stateDropdown = document.getElementById("states");
             const districtDropdown = document.getElementById("districtdropdown");
             const districtcontainer = document.getElementById("district-container");
             const selectedState = stateDropdown.value;
 
-            console.log('Selected State:', selectedState); 
+            console.log('Selected State:', selectedState);
 
-            
+
             districtDropdown.innerHTML = '<option value="">Select District</option>';
 
             if (selectedState && districtsByState[selectedState]) {
@@ -819,8 +827,98 @@
 
         // Add event listener to update districts on state change
         document.getElementById('states').addEventListener('change', updateDistricts);
+
+        // Function to get coordinates of selected attractions
+        async function getCoordinates(attraction) {
+            const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(attraction)}&format=json&limit=1`;
+
+            try {
+                const response = await fetch(nominatimUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching geocode for ${attraction}: ${response.status} - ${response.statusText}`);
+                    return null;
+                }
+
+                const data = await response.json();
+                if (data.length > 0) {
+                    return { latitude: data[0].lat, longitude: data[0].lon };
+                } else {
+                    console.error(`Geocode not found for ${attraction}`);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching geocode:', error);
+                return null;
+            }
+        }
+
+
+
+        // Function to search hotels near selected attractions
+        async function findNearbyHotels(coordinatesList) {
+            const geoapifyPlacesApiKey = 'ca9a3174a33a4ea3b5e443895f9985fd'; // Replace with your Geoapify Places API key
+
+            try {
+                for (const coords of coordinatesList) {
+                    const { latitude, longitude } = coords;
+                    const geoapifyPlacesUrl = `https://api.geoapify.com/v2/places?categories=accommodation.hotel&limit=10&bias=proximity&lat=${latitude}&lon=${longitude}&radius=10000&apiKey=${geoapifyPlacesApiKey}`;
+
+                    const response = await fetch(geoapifyPlacesUrl);
+                    if (!response.ok) {
+                        console.error(`Error fetching hotels near (${latitude}, ${longitude}): ${response.status} - ${response.statusText}`);
+                        continue;
+                    }
+
+                    const data = await response.json();
+                    console.log('Hotels Data:', data); // Debugging line
+                    displayHotels(data.features);
+                }
+            } catch (error) {
+                console.error('Error fetching hotels:', error);
+            }
+        }
+
+        // Function to display hotels
+        function displayHotels(hotels) {
+            const hotelContainer = document.getElementById('hotels-container');
+            hotelContainer.innerHTML = ''; // Clear previous results
+
+            if (hotels.length === 0) {
+                hotelContainer.textContent = 'No hotels found near the selected attractions.';
+            } else {
+                hotels.forEach(hotel => {
+                    const hotelElement = document.createElement('div');
+                    hotelElement.textContent = `${hotel.properties.name} - ${hotel.properties.city}`;
+                    hotelContainer.appendChild(hotelElement);
+                });
+            }
+        }
+
+        // Function to search hotels near selected attractions
+        async function searchHotels() {
+            const selectedAttractions = Array.from(document.querySelectorAll('input[name="attractions"]:checked')).map(checkbox => checkbox.value);
+            if (selectedAttractions.length === 0) {
+                alert('Please select at least one attraction');
+                return;
+            }
+
+            const coordinatesList = [];
+            for (const attraction of selectedAttractions) {
+                const coords = await getCoordinates(attraction);
+                if (coords) {
+                    coordinatesList.push(coords);
+                }
+            }
+
+            console.log('Coordinates List:', coordinatesList);
+
+            if (coordinatesList.length > 0) {
+                findNearbyHotels(coordinatesList);
+            }
+        }
+
+        document.getElementById('search-hotels-btn').addEventListener('click', searchHotels);
     </script>
-    <?php include('footer.php'); ?>
 </body>
 
 </html>
