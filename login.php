@@ -1,265 +1,284 @@
 <?php
-if (isset($_POST['submit'])) {
-  $email = $_POST['email'];
-  $password = $_POST['pass'];
+include('header.php');
 
-  // Password validation
-  if (strlen($password) < 8 || !preg_match("/[0-9]/", $password) /* || !preg_match("/[\W]/", $password) */) {
-    echo "<script>alert('Password must be at least 8 characters long and include at least one number.');</script>";
-  } else {
+// Function to safely output debug information
+function debug_to_console($data)
+{
+    $output = $data;
+    if (is_array($output))
+        $output = implode(',', $output);
+
+    echo "<script>console.log('" . addslashes($output) . "');</script>";
+}
+
+$email_error = $password_error = ""; // Initialize error messages
+
+if (isset($_POST['submit'])) {
+    $email = $_POST['email'];
+    $password = $_POST['pass'];
+    debug_to_console("Login attempt for email: " . $email);
     $conn = mysqli_connect("localhost", "root", "", "tourmentor");
     if (!$conn) {
-      die("connection failed");
+        die("Connection failed: " . mysqli_connect_error());
     }
 
-    $sql = "SELECT * FROM userreg WHERE email = '$email'";
-    $result = mysqli_query($conn, $sql);
+    $sql = "SELECT * FROM userreg WHERE email = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-    if (mysqli_num_rows($result) > 0) {
-      $row = mysqli_fetch_assoc($result);
-      if (password_verify($password, $row['password'])) {
-        echo "<script>alert('Welcome to Tourmentor!');</script>";
-        header("Location: index.php");
-        exit();
-      } else {
-        echo "<script>alert('Invalid password');</script>";
-      }
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        if (password_verify($password, $row['password'])) {
+            // Set session variables
+            $_SESSION['user_email'] = $row['email'];
+            $_SESSION['user_name'] = $row['name'];
+            $_SESSION['user_profile_pic'] = $row['filename'];
+
+            debug_to_console("Login successful for: " . $email);
+            debug_to_console("Profile picture filename: " . $row['filename']);
+
+            echo "<script>alert('Welcome to Tourmentor!');</script>";
+            echo "<script>window.location.href = 'index.php';</script>";
+            exit();
+        } else {
+            $password_error = "Invalid password. Please try again.";
+            debug_to_console("Invalid password for: " . $email);
+        }
     } else {
-      echo "<script>alert('Invalid email');</script>";
+        $email_error = "Invalid email. Please try again.";
+        debug_to_console("Invalid email: " . $email);
     }
 
     mysqli_close($conn);
-  }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TourMentor - Login</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #fff7e6;
-      /* Light orange background */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TourMentor - Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff7e6;
+        }
 
-    .login-container {
-      background-color: #fff;
-      margin-top: 50px;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgb(126, 126, 143);
-      /* Light shadow effect */
-      width: 300px;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-      margin: 130px;
-    }
+        .login-container {
+            background-color: #fff;
+            margin-top: 50px;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgb(126, 126, 143);
+            width: 300px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+            margin: 130px;
+        }
 
-    .login-container h2 {
-      margin-bottom: 20px;
-      color: #333;
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(30, end), blink-caret 0.5s step-end infinite;
+        }
 
-      overflow: hidden;
-      white-space: nowrap;
+        @keyframes typing {
+            from {
+                width: 0;
+            }
 
-      animation: typing 3s steps(30, end), blink-caret 0.5s step-end infinite;
-    }
+            to {
+                width: 100%;
+            }
+        }
 
-    @keyframes typing {
-      from {
-        width: 0;
-      }
+        @keyframes blink-caret {
+            from,
+            to {
+                border-color: transparent;
+            }
 
-      to {
-        width: 100%;
-      }
-    }
+            50% {
+                border-color: #333;
+            }
+        }
 
-    @keyframes blink-caret {
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ffa500;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-      from,
-      to {
-        border-color: transparent;
-      }
+        .login-container .error-message {
+            color: red;
+            font-size: 12px;
+            text-align: left;
+            margin: 5px 0;
+        }
 
-      50% {
-        border-color: #333;
-      }
-    }
+        .login-container button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #ffa500;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
 
-    .login-container input[type="email"],
-    .login-container input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 2px solid #ffa500;
-      /* Orange border */
-      border-radius: 5px;
-      font-size: 16px;
-    }
+        .login-container button[type="submit"]:hover {
+            background-color: #e69500;
+        }
 
-    .login-container button[type="submit"] {
-      width: 100%;
-      padding: 10px;
-      background-color: #ffa500;
-      /* Orange background */
-      border: none;
-      border-radius: 5px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
+        .login-container a {
+            display: block;
+            margin-top: 10px;
+            color: black;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
-    .login-container button[type="submit"]:hover {
-      background-color: #e69500;
-      /* Darker orange on hover */
-    }
+        .login-container a:hover {
+            color: grey;
+        }
 
-    .login-container a {
-      display: block;
-      margin-top: 10px;
-      color: black;
-      /* Orange text */
-      text-decoration: none;
-      font-size: 14px;
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
 
-    .login-container a:hover {
-      color: grey;
-      /* Darker orange on hover */
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
+        .login-container input:focus,
+        .login-container button:focus {
+            outline: none;
+            box-shadow: 0 0 10px #ffa500;
+        }
 
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        .circle {
+            position: fixed;
+            border-radius: 50%;
+            background: #ffa600;
+            animation: ripple 20s infinite;
+            box-shadow: 0px 0px 1px 0px #508fb9;
+            pointer-events: none;
+        }
 
-    .login-container input:focus,
-    .login-container button:focus {
-      outline: none;
-      box-shadow: 0 0 10px #ffa500;
-      /* Orange glow effect */
-    }
+        .small {
+            width: 200px;
+            height: 200px;
+            left: -100px;
+            bottom: -100px;
+        }
 
-    .circle {
-      position: fixed;
-      border-radius: 50%;
-      background: #ffa600;
-      animation: ripple 20s infinite;
-      box-shadow: 0px 0px 1px 0px #508fb9;
-      pointer-events: none;
-    }
+        .medium {
+            width: 400px;
+            height: 400px;
+            left: -200px;
+            bottom: -200px;
+        }
 
-    .small {
-      width: 200px;
-      height: 200px;
-      left: -100px;
-      bottom: -100px;
-    }
+        .large {
+            width: 600px;
+            height: 600px;
+            left: -300px;
+            bottom: -300px;
+        }
 
-    .medium {
-      width: 400px;
-      height: 400px;
-      left: -200px;
-      bottom: -200px;
-    }
+        .xlarge {
+            width: 800px;
+            height: 800px;
+            left: -400px;
+            bottom: -400px;
+        }
 
-    .large {
-      width: 600px;
-      height: 600px;
-      left: -300px;
-      bottom: -300px;
-    }
+        .xxlarge {
+            width: 1000px;
+            height: 1000px;
+            left: -500px;
+            bottom: -500px;
+        }
 
-    .xlarge {
-      width: 800px;
-      height: 800px;
-      left: -400px;
-      bottom: -400px;
-    }
+        .shade1 {
+            opacity: 0.2;
+        }
 
-    .xxlarge {
-      width: 1000px;
-      height: 1000px;
-      left: -500px;
-      bottom: -500px;
-    }
+        .shade2 {
+            opacity: 0.5;
+        }
 
-    .shade1 {
-      opacity: 0.2;
-    }
+        .shade3 {
+            opacity: 0.7;
+        }
 
-    .shade2 {
-      opacity: 0.5;
-    }
+        .shade4 {
+            opacity: 0.8;
+        }
 
-    .shade3 {
-      opacity: 0.7;
-    }
+        .shade5 {
+            opacity: 0.9;
+        }
 
-    .shade4 {
-      opacity: 0.8;
-    }
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+            }
 
-    .shade5 {
-      opacity: 0.9;
-    }
+            50% {
+                transform: scale(1.2);
+            }
 
-    @keyframes ripple {
-      0% {
-        transform: scale(0.8);
-      }
-
-      50% {
-        transform: scale(1.2);
-      }
-
-      100% {
-        transform: scale(0.8);
-      }
-    }
-  </style>
+            100% {
+                transform: scale(0.8);
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <?php include('header.php'); ?>
-  <div class="ripple-background">
-    <div class="circle xxlarge shade1"></div>
-    <div class="circle xlarge shade2"></div>
-    <div class="circle large shade3"></div>
-    <div class="circle medium shade4"></div>
-    <div class="circle small shade5"></div>
-  </div>
+    <?php include('header.php'); ?>
+    <div class="ripple-background">
+        <div class="circle xxlarge shade1"></div>
+        <div class="circle xlarge shade2"></div>
+        <div class="circle large shade3"></div>
+        <div class="circle medium shade4"></div>
+        <div class="circle small shade5"></div>
+    </div>
 
-  <div class="login-container">
-    <h2 id="typing-header">Hey There!<br>Welcome Back.</h2>
-    <form method="POST" action="">
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="password" name="pass" placeholder="Password" required>
-      <button type="submit" name="submit">Login</button>
-    </form>
-    <a href="#">Forgot Password?</a>
-    <a href="signup.php">Don't have an account?Sign Up</a>
-  </div>
+    <div class="login-container">
+        <h2 id="typing-header">Hey There!<br>Welcome Back.</h2>
+        <form method="POST" action="">
+            <input type="email" name="email" placeholder="Email" required>
+            <?php if (!empty($email_error)) echo "<div class='error-message'>$email_error</div>"; ?>
+            <input type="password" name="pass" placeholder="Password" required>
+            <?php if (!empty($password_error)) echo "<div class='error-message'>$password_error</div>"; ?>
+            <button type="submit" name="submit">Login</button>
+        </form>
+        <a href="#">Forgot Password?</a>
+        <a href="signup.php">Don't have an account? Sign Up</a>
+    </div>
 </body>
 
 </html>

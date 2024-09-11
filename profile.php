@@ -1,3 +1,29 @@
+<?php
+include('header.php');
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_email'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Get user information from session
+$name = $_SESSION['user_name'];
+$email = $_SESSION['user_email'];
+$profile_pic = $_SESSION['user_profile_pic'];
+
+// Define the directory where profile pictures are stored
+$upload_dir = './uimages/';
+
+// Check if the profile picture file exists
+if (!empty($profile_pic) && file_exists($upload_dir . $profile_pic)) {
+    $profile_pic_path = $upload_dir . $profile_pic;
+} else {
+    // Use a default image if the profile picture doesn't exist
+    $profile_pic_path = './image/default_profile.png';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -91,14 +117,14 @@
     <?php include('header.php'); ?>
     <div class="containerr">
         <div class="container-item">
-            <img src="./image/taj-mahal-india.webp" alt="user-image" class="img">
+            <img src="./image/<?php echo $profile_pic; ?>" alt="user-image" class="img">
             <div class="nme">
                 <h2>Name:</h2>
-                <p>Elisa</p>
+                <p><?php echo $name; ?></p>
             </div>
             <div class="Email">
                 <h2>Email:</h2>
-                <p>Elisa@gmail.com</p>
+                <p><?php echo $email; ?></p>
             </div>
             <div class="buttons">
                 <a href="logout.php">Logout</a>

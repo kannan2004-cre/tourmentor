@@ -18,7 +18,7 @@ if (isset($_POST['submit'])) {
         $sql = "INSERT INTO userreg (`name`, `email`, `password`,`filename`) VALUES ('$name', '$email', '$hpass','$filename')";
         if ((mysqli_query($conn, $sql)) && (move_uploaded_file($tempname, $folder))) {
             echo "<script>alert('registered successfully')</script>";
-            header("Location: index.php");
+            header("Location: login.php");
         } else {
             echo "<script>alert('OOPS! Registration failed');</script>";
         }

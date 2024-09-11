@@ -1,3 +1,11 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+$isLoggedIn = isset($_SESSION['user_email']);
+?>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -25,8 +33,9 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 </head>
- <!-- ======= Header ======= -->
- <header id="header" class="header fixed-top d-flex align-items-center">
+<body>
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
     <div class="container d-flex align-items-center justify-content-between">
 
       <a href="index.php" class="logo d-flex align-items-center me-auto me-lg-0">
@@ -38,12 +47,14 @@
       <nav id="navbar" class="navbar">
         <ul>
           <li><a href="index.php">Home</a></li>
-          <li><a href="search.php">search</a></li>
+          <li><a href="search.php">Search</a></li>
           <li><a href="booking.php">Hotels</a></li>
-          <li><a href="admin.html">Admin</a></li>
-          <li><a href="profile.php">Profile</a></li>
-          <li><a href="login.php">Login</a></li>
-
+          <?php if ($isLoggedIn): ?>
+            <li><a href="profile.php">Profile</a></li>
+            <li><a href="logout.php">Logout</a></li>
+          <?php else: ?>
+            <li><a href="login.php">Login</a></li>
+          <?php endif; ?>
         </ul>
       </nav><!-- .navbar -->
       <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
@@ -51,3 +62,5 @@
 
     </div>
   </header><!-- End Header -->
+</body>
+</html>
