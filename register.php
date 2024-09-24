@@ -11,7 +11,8 @@ if (isset($_POST['submit'])) {
         die("connection failed");
     }
     if (strlen($password) < 8 || !preg_match("/[0-9]/", $password)  || !preg_match("/[\W]/", $password) ) {
-        echo "<script>alert('Password must be at least 8 characters long and include at least one number.');</script>";
+        echo "<script>alert('Password must be at least 8 characters long, include at least one number and a special charecter.');</script>";
+        header("Location:signup.php");
         exit(0);
     } else {
         $hpass = password_hash($password, PASSWORD_DEFAULT);

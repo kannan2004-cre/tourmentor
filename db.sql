@@ -40,3 +40,19 @@ create table reviews(
     title varchar(255) not null,
     review text not null,
 );
+
+CREATE TABLE hotels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    price_per_night DECIMAL(10, 2) NOT NULL,
+    rating DECIMAL(3, 1) NOT NULL,
+    picture_url VARCHAR(255) 
+);
+
+CREATE TABLE hotel_attractions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hotel_id INT NOT NULL,
+    attractions_info TEXT NOT NULL, 
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id)
+);

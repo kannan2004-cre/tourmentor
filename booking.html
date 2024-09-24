@@ -69,12 +69,83 @@
             display: flex;
 
         }
+
+        #hotels-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .hotel-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hotel-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .book-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #booking-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
     <div class="booking-conatiner">
-        <form action="">
+        <form action="search_hotels.php" method="post">
             <div class="dropdown">
                 <div class="state-container">
                     <label for="states">
@@ -130,9 +201,8 @@
                     </label>
                 </div>
                 <div id="attractions-container" style="display: none;"></div>
+                <button type="submit" id="search-hotels-btn">Search Hotels</button>
 
-                <button type="button" id="search-hotels-btn" onclick="searchHotels()">Search Hotels</button>
-                <div id="hotels-container"></div>
             </div>
         </form>
     </div>
@@ -419,7 +489,7 @@
             ],
 
             // Kerala
-            'Kochi': [
+            'Ernakulam': [
                 'Fort Kochi',
                 'Mattancherry Palace',
                 'Jew Town',
@@ -728,14 +798,15 @@
 
             // Uttar Pradesh
             'Agra': [
-                'Taj Mahal',
-                'Agra Fort',
+                'gateway of india',
+                'Red Fort',
                 'Fatehpur Sikri',
                 'Itmad-ud-Daulah',
                 'Mehtab Bagh',
                 'Jama Masjid',
                 'Ram Bagh',
-                'Mariams Tomb'
+                'Mariams Tomb',
+                'Taj Ganj'
             ],
             'Lucknow': [
                 'Bara Imambara',
@@ -760,7 +831,7 @@
                 checkbox.type = 'checkbox';
                 checkbox.id = attraction;
                 checkbox.value = attraction;
-                checkbox.name = 'attractions';
+                checkbox.name = 'attractions[]';  // Changed to array for multiple selections
 
                 const label = document.createElement('label');
                 label.htmlFor = attraction;
@@ -827,97 +898,6 @@
 
         // Add event listener to update districts on state change
         document.getElementById('states').addEventListener('change', updateDistricts);
-
-        // Function to get coordinates of selected attractions
-        async function getCoordinates(attraction) {
-            const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(attraction)}&format=json&limit=1`;
-
-            try {
-                const response = await fetch(nominatimUrl);
-                if (!response.ok) {
-                    console.error(`Error fetching geocode for ${attraction}: ${response.status} - ${response.statusText}`);
-                    return null;
-                }
-
-                const data = await response.json();
-                if (data.length > 0) {
-                    return { latitude: data[0].lat, longitude: data[0].lon };
-                } else {
-                    console.error(`Geocode not found for ${attraction}`);
-                    return null;
-                }
-            } catch (error) {
-                console.error('Error fetching geocode:', error);
-                return null;
-            }
-        }
-
-
-
-        // Function to search hotels near selected attractions
-        async function findNearbyHotels(coordinatesList) {
-            const geoapifyPlacesApiKey = 'ca9a3174a33a4ea3b5e443895f9985fd'; // Replace with your Geoapify Places API key
-
-            try {
-                for (const coords of coordinatesList) {
-                    const { latitude, longitude } = coords;
-                    const geoapifyPlacesUrl = `https://api.geoapify.com/v2/places?categories=accommodation.hotel&limit=10&bias=proximity&lat=${latitude}&lon=${longitude}&radius=10000&apiKey=${geoapifyPlacesApiKey}`;
-
-                    const response = await fetch(geoapifyPlacesUrl);
-                    if (!response.ok) {
-                        console.error(`Error fetching hotels near (${latitude}, ${longitude}): ${response.status} - ${response.statusText}`);
-                        continue;
-                    }
-
-                    const data = await response.json();
-                    console.log('Hotels Data:', data); // Debugging line
-                    displayHotels(data.features);
-                }
-            } catch (error) {
-                console.error('Error fetching hotels:', error);
-            }
-        }
-
-        // Function to display hotels
-        function displayHotels(hotels) {
-            const hotelContainer = document.getElementById('hotels-container');
-            hotelContainer.innerHTML = ''; // Clear previous results
-
-            if (hotels.length === 0) {
-                hotelContainer.textContent = 'No hotels found near the selected attractions.';
-            } else {
-                hotels.forEach(hotel => {
-                    const hotelElement = document.createElement('div');
-                    hotelElement.textContent = `${hotel.properties.name} - ${hotel.properties.city}`;
-                    hotelContainer.appendChild(hotelElement);
-                });
-            }
-        }
-
-        // Function to search hotels near selected attractions
-        async function searchHotels() {
-            const selectedAttractions = Array.from(document.querySelectorAll('input[name="attractions"]:checked')).map(checkbox => checkbox.value);
-            if (selectedAttractions.length === 0) {
-                alert('Please select at least one attraction');
-                return;
-            }
-
-            const coordinatesList = [];
-            for (const attraction of selectedAttractions) {
-                const coords = await getCoordinates(attraction);
-                if (coords) {
-                    coordinatesList.push(coords);
-                }
-            }
-
-            console.log('Coordinates List:', coordinatesList);
-
-            if (coordinatesList.length > 0) {
-                findNearbyHotels(coordinatesList);
-            }
-        }
-
-        document.getElementById('search-hotels-btn').addEventListener('click', searchHotels);
     </script>
 </body>
 
