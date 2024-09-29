@@ -56,3 +56,28 @@ CREATE TABLE hotel_attractions (
     attractions_info TEXT NOT NULL, 
     FOREIGN KEY (hotel_id) REFERENCES hotels(id)
 );
+
+-- Table for room types
+CREATE TABLE room_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hotel_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    price_per_night DECIMAL(10, 2) NOT NULL,
+    capacity INT NOT NULL,
+    description TEXT,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id)
+);
+
+-- Table for bookings
+CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hotel_id INT NOT NULL,
+    room_type_id INT NOT NULL,
+    guest_name VARCHAR(255) NOT NULL,
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
+    booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (hotel_id) REFERENCES hotels(id),
+    FOREIGN KEY (room_type_id) REFERENCES room_types(id)
+);

@@ -32,6 +32,7 @@ if (isset($_POST['submit'])) {
         $row = mysqli_fetch_assoc($result);
         if (password_verify($password, $row['password'])) {
             // Set session variables
+            $_SESSION['loggedin']=true;
             $_SESSION['user_email'] = $row['email'];
             $_SESSION['user_name'] = $row['name'];
             $_SESSION['user_profile_pic'] = $row['filename'];
