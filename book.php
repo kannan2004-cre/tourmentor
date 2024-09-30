@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,30 +59,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin: 0;
             padding: 0;
         }
-        .container {
+
+        .containe {
             width: 80%;
             margin: 0 auto;
             padding: 20px;
             margin-top: 80px;
         }
+
         h1 {
             text-align: center;
             color: #333;
         }
+
         .booking-form {
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             color: #666;
         }
+
         input[type="text"],
         input[type="date"],
         select {
@@ -91,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-radius: 5px;
             font-size: 16px;
         }
+
         .submit-btn {
             background-color: #2196f3;
             color: white;
@@ -100,14 +108,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-size: 18px;
             cursor: pointer;
         }
+
         .submit-btn:hover {
             background-color: #1976d2;
         }
     </style>
 </head>
+
 <body>
     <?php include 'header.php'; ?>
-    <div class="container">
+    <div class="containe">
         <h1>Book a Room at <?php echo htmlspecialchars($hotel['name']); ?></h1>
         <div class="booking-form">
             <form method="post">
@@ -130,8 +140,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="date" id="check_out" name="check_out" required>
                 </div>
                 <div class="form-group">
-                    <label for="guest_name">Guest Name:</label>
-                    <input type="text" id="guest_name" name="guest_name" required>
+                    <label for="guest_name">Guest Name:<br></label>
+                    <input type="text" id="guest_name" name="guest_name" value="<?php echo htmlspecialchars($_SESSION['user_name']); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label for="guest_email">Guest Email:</label>
+                    <input type="hidden" id="guestemail" name="guestemail" value="<?php echo htmlspecialchars($_SESSION['user_email']); ?>">
+                    <p><?php echo htmlspecialchars($_SESSION['user_email']); ?></p>
                 </div>
                 <div class="form-group">
                     <label for="card_number">Card Number:</label>
@@ -151,4 +167,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <?php include('footer.php'); ?>
 </body>
+
 </html>

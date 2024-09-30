@@ -1,6 +1,9 @@
 <?php
 include('header.php');
 
+// Start the session
+session_start();
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_email'])) {
     header("Location: login.php");
@@ -23,8 +26,36 @@ if (!empty($profile_pic) && file_exists($upload_dir . $profile_pic)) {
     $profile_pic_path = './image/default_pic.webp';
 }
 
-// Fetch booked hotels from the database
-$bookedHotels = []; // Example array, replace with DB query for actual data
+// Connect to the database
+$conn = new mysqli("localhost", "root", "", "tourmentor");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch booked hotels for the logged-in user
+$sql = "SELECT b.id, h.name AS hotel_name, h.address, rt.name AS room_type, b.check_in, b.check_out, b.total_price, h.picture_url
+        FROM bookings b
+        INNER JOIN hotels h ON b.hotel_id = h.id
+        INNER JOIN room_types rt ON b.room_type_id = rt.id
+        WHERE b.guest_name = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('s', $name); // Binding the user's name from the session
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch the booked hotels into an array
+$bookedHotels = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $bookedHotels[] = $row;
+    }
+}
+
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -35,13 +66,14 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <style>
+        /* Your existing styles */
+        /* Profile Section */
         body {
             background-color: #f9fbfd;
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
         }
-
         .profile-container {
             display: flex;
             justify-content: center;
@@ -49,7 +81,6 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             margin-top: 40px;
             padding: 40px 0;
         }
-
         .profile-card {
             background-color: white;
             border-radius: 12px;
@@ -58,7 +89,6 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             text-align: center;
             width: 320px;
         }
-
         .profile-card img {
             height: 120px;
             width: 120px;
@@ -67,27 +97,23 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             border: 4px solid #e0e0e0;
             margin-bottom: 20px;
         }
-
         .profile-card h2 {
             font-size: 24px;
             font-weight: 600;
             color: #333;
             margin-bottom: 10px;
         }
-
         .profile-card p {
             font-size: 16px;
             color: #666;
             margin: 5px 0;
         }
-
         .profile-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-top: 25px;
         }
-
         .profile-buttons a {
             padding: 10px 24px;
             border-radius: 6px;
@@ -96,35 +122,31 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             text-decoration: none;
             transition: all 0.3s ease;
         }
-
         .profile-buttons a.logout {
             background-color: #cf1313;
             border: 2px solid #cf1313;
             color: white;
         }
-
         .profile-buttons a.edit {
             background-color: transparent;
             border: 2px solid #cf1313;
             color: #cf1313;
         }
-
         .profile-buttons a:hover.logout {
             background-color: #ffa600;
             border-color: #ffa600;
             color: black;
         }
-
         .profile-buttons a:hover.edit {
             border-color: #ffa600;
             color: #ffa600;
         }
 
+        /* Booked Hotels Section */
         .booked-hotels {
             margin: 50px auto;
             width: 80%;
         }
-
         .booked-hotels h2 {
             text-align: center;
             font-size: 28px;
@@ -132,7 +154,6 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             color: #333;
             margin-bottom: 20px;
         }
-
         .hotel-card {
             background-color: #ffffff;
             border-radius: 10px;
@@ -143,50 +164,41 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             gap: 20px;
             transition: transform 0.3s ease;
         }
-
         .hotel-card:hover {
             transform: scale(1.02);
         }
-
         .hotel-image {
             width: 120px;
             height: 120px;
             border-radius: 10px;
             object-fit: cover;
         }
-
         .hotel-details {
             flex: 1;
         }
-
         .hotel-details h3 {
             font-size: 22px;
             color: #333;
             margin: 0;
         }
-
         .hotel-details p {
             margin: 5px 0;
             color: #555;
             font-size: 18px;
         }
-
         .hotel-details .price {
             color: #d32f2f;
             font-weight: bold;
         }
-
         .hotel-details .booking-date {
             color: #757575;
             font-size: 16px;
         }
-
         .hotel-actions {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-
         .hotel-actions a {
             background-color: #cf1313;
             color: white;
@@ -196,52 +208,15 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
             text-decoration: none;
             font-size: 16px;
         }
-
         .hotel-actions a:hover {
             background-color: #ffa600;
             border-color: #ffa600;
             color: black;
         }
-
-        @media (max-width: 768px) {
-            .profile-card {
-                width: 90%;
-                padding: 30px;
-            }
-
-            .profile-card h2 {
-                font-size: 22px;
-            }
-
-            .profile-card p {
-                font-size: 14px;
-            }
-
-            .profile-buttons a {
-                font-size: 14px;
-            }
-
-            .hotel-card {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .hotel-image {
-                margin: 0 auto 10px;
-            }
-
-            .hotel-actions {
-                flex-direction: row;
-                justify-content: center;
-                gap: 15px;
-            }
-        }
     </style>
 </head>
 
 <body>
-    <?php include('header.php'); ?>
-    
     <!-- Profile Section -->
     <div class="profile-container">
         <div class="profile-card">
@@ -263,11 +238,13 @@ $bookedHotels = []; // Example array, replace with DB query for actual data
         <?php else : ?>
             <?php foreach ($bookedHotels as $hotel) : ?>
                 <div class="hotel-card">
-                    <img src="<?php echo $hotel['image_url']; ?>" alt="Hotel Image" class="hotel-image">
+                    <img src="<?php echo htmlspecialchars($hotel['picture_url']); ?>" alt="Hotel Image" class="hotel-image">
                     <div class="hotel-details">
-                        <h3><?php echo htmlspecialchars($hotel['name']); ?></h3>
-                        <p class="price">₹<?php echo htmlspecialchars($hotel['price']); ?> per night</p>
-                        <p class="booking-date">Booking Date: <?php echo htmlspecialchars($hotel['booking_date']); ?></p>
+                        <h3><?php echo htmlspecialchars($hotel['hotel_name']); ?></h3>
+                        <p>Room Type: <?php echo htmlspecialchars($hotel['room_type']); ?></p>
+                        <p class="price">₹<?php echo htmlspecialchars($hotel['total_price']); ?></p>
+                        <p class="booking-date">Check-in: <?php echo htmlspecialchars($hotel['check_in']); ?></p>
+                        <p class="booking-date">Check-out: <?php echo htmlspecialchars($hotel['check_out']); ?></p>
                     </div>
                     <div class="hotel-actions">
                         <a href="hotel-details.php?id=<?php echo $hotel['id']; ?>">View Details</a>

@@ -81,3 +81,4 @@ CREATE TABLE bookings (
     FOREIGN KEY (hotel_id) REFERENCES hotels(id),
     FOREIGN KEY (room_type_id) REFERENCES room_types(id)
 );
+
