@@ -225,7 +225,7 @@ $conn->close();
             <p>Email: <?php echo htmlspecialchars($email); ?></p>
             <div class="profile-buttons">
                 <a href="logout.php" class="logout">Logout</a>
-                <a href="#" class="edit">Edit</a>
+                <a href="editprofile.php" class="edit">Edit</a>
             </div>
         </div>
     </div>
@@ -247,7 +247,6 @@ $conn->close();
                         <p class="booking-date">Check-out: <?php echo htmlspecialchars($hotel['check_out']); ?></p>
                     </div>
                     <div class="hotel-actions">
-                        <a href="hotel-details.php?id=<?php echo $hotel['id']; ?>">View Details</a>
                         <a href="cancel-booking.php?id=<?php echo $hotel['id']; ?>">Cancel Booking</a>
                     </div>
                 </div>

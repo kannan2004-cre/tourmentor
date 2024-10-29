@@ -1,3 +1,39 @@
+<?php
+session_start();
+
+// If admin is already logged in, redirect to admin panel
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: admin.php");
+    exit();
+}
+
+$error_message = "";
+
+if (isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $pass = $_POST['pass'];
+
+    $con = mysqli_connect("localhost", "root", "", "tourmentor");
+
+    if (!$con) {
+        $error_message = "Database connection failed!";
+    } else {
+        $valid_email = 'admin2024@gmail.com';
+        $valid_password = 'admin#123';
+
+        // In a real-world scenario, you should use password_hash() and password_verify()
+        if ($email === $valid_email && $pass === $valid_password) {
+            $_SESSION['admin_logged_in'] = true;
+            header("Location: admin.php");
+            exit();
+        } else {
+            $error_message = "Invalid email or password. Please try again.";
+        }
+    }
+    mysqli_close($con);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,13 +51,18 @@
             border-radius: 10px;
             width: 500px;
             padding: 20px;
-            margin-left: 400px;
-            margin-top: 100px;
+            margin: 100px auto;
             font-weight: bold;
         }
 
         .admin-login h2 {
             text-align: center;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -30,38 +71,18 @@
     <form action="" method="POST">
         <div class="admin-login">
             <h2>Welcome Admin!</h2>
-            Email: <input type="email" name="email" placeholder="Enter email" required>
-            Password: <input type="password" name="pass" placeholder="Enter password" required>
+            <?php
+            if (!empty($error_message)) {
+                echo "<p class='error-message'>$error_message</p>";
+            }
+            ?>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter email" required>
+            <label for="pass">Password:</label>
+            <input type="password" id="pass" name="pass" placeholder="Enter password" required>
             <button type="submit" name="login">Login</button>
         </div>
     </form>
 </body>
 
 </html>
-
-<?php
-session_start(); 
-
-if (isset($_POST['login'])) {
-    $email = $_POST['email'];
-    $pass = $_POST['pass'];
-
-    
-    $con = mysqli_connect("localhost", "root", "", "tourmentor");
-
-    if (!$con) {
-        echo "Database connection failed!";
-    } else {
-        $valid_email = 'admin2024@gmail.com';
-        $valid_password = 'admin#123';
-
-        if ($email === $valid_email && $pass === $valid_password) {
-            $_SESSION['admin_logged_in'] = true;
-            header("Location: admin.html");
-            exit();
-        } else {
-            echo "<p style='color:red; text-align:center;'>Invalid email or password. +Please try again.</p>";
-        }
-    }
-}
-?>

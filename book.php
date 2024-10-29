@@ -33,9 +33,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $card_expiry = $_POST['card_expiry'];
     $card_cvv = $_POST['card_cvv'];
 
+    // Fetch the price for the selected room type
+    $price_query = "SELECT price_per_night FROM room_types WHERE id = $room_type_id";
+    $price_result = mysqli_query($conn, $price_query);
+    $price_row = mysqli_fetch_assoc($price_result);
+    $price_per_night = $price_row['price_per_night'];
+
+    // Calculate total price (assuming check-in and check-out are in the correct format)
+    $check_in_date = new DateTime($check_in);
+    $check_out_date = new DateTime($check_out);
+    $nights = $check_out_date->diff($check_in_date)->days;
+    $total_price = $price_per_night * $nights;
+
     // Insert booking into database (simplified, you'd want more error handling and security measures)
-    $booking_query = "INSERT INTO bookings (hotel_id, room_type_id, guest_name, check_in, check_out) 
-                      VALUES ($hotel_id, $room_type_id, '$guest_name', '$check_in', '$check_out')";
+    $booking_query = "INSERT INTO bookings (hotel_id, room_type_id, guest_name, check_in, check_out, total_price) 
+                      VALUES ($hotel_id, $room_type_id, '$guest_name', '$check_in', '$check_out', $total_price)";
     if (mysqli_query($conn, $booking_query)) {
         echo "<script>alert('Booking successful!'); window.location.href = 'booking_confirmation.php?booking_id=" . mysqli_insert_id($conn) . "';</script>";
         exit;

@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // If not logged in, redirect to admin login page
+    echo "Not logged in. Redirecting...";
+    header("Location: adlogin.php");
+    exit();
+}
+
+// Rest of your HTML code follows...
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -45,9 +59,8 @@
 
         .navbar {
             display: flex;
-            justify-content:flex-end ;
+            justify-content: flex-end;
         }
-
 
         .navbar a {
             text-decoration: none;
@@ -67,7 +80,6 @@
     <div class="admin-panel">
         <button class="upload"><a href="upload.php">Upload</a></button><br>
         <button class="hotel"><a href="hotelinsert.php">Insert Hotels</a></button>
-        <button class="delete"><a href="delete.php">Delete</a></button><br>
         <button class="update"><a href="update.php">Update</a></button><br>
         <button class="view"><a href="view.php">View</a></button><br>
         <button class="logout"><a href="adlogout.php">Logout</a></button>

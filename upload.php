@@ -28,11 +28,9 @@ if (isset($_POST['upload'])) {
         $destination = mysqli_real_escape_string($db, $_POST['destination']);
         $description = mysqli_real_escape_string($db, $_POST['description']);
         $price = mysqli_real_escape_string($db, $_POST['price']);
-        $hotel_name = mysqli_real_escape_string($db, $_POST['hotel_name']);
-        $hotel_url = mysqli_real_escape_string($db, $_POST['hotel_url']);
 
-        $sql = "INSERT INTO destinations (`filename`, `state`, `district`, `location`, `destination`, `description`, `price`, `hotel_name`, `hotel_url`) 
-                VALUES ('$filename', '$state', '$district', '$location', '$destination', '$description', '$price', '$hotel_name', '$hotel_url')";
+        $sql = "INSERT INTO destinations (`filename`, `state`, `district`, `location`, `destination`, `description`, `price`) 
+                VALUES ('$filename', '$state', '$district', '$location', '$destination', '$description', '$price')";
 
         // Execute query
         if (mysqli_query($db, $sql)) {
@@ -113,8 +111,7 @@ if (isset($_POST['upload'])) {
 
         .details input[type="text"],
         .details select,
-        .form-group input[type="file"],
-        .details input[type="url"] {
+        .form-group input[type="file"] {
             width: 100%;
             padding: 8px;
             margin: 8px 0;
@@ -189,14 +186,6 @@ if (isset($_POST['upload'])) {
                     </div>
                     <div>
                         Price:<input type="text" name="price" placeholder="Enter Price" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div>
-                        Nearest Hotel Name:<input type="text" name="hotel_name" placeholder="Enter Nearest Hotel Name" required>
-                    </div>
-                    <div>
-                        Hotel URL:<input type="url" name="hotel_url" placeholder="Enter Hotel URL" required>
                     </div>
                 </div>
             </div>
