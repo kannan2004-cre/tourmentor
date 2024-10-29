@@ -1,213 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking</title>
+    <title>TravelEase Booking</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        .booking-container {
-            display: flex;
-            justify-content: center;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .dropdown {
-            display: flex;
-            gap: 25px;
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
         }
 
-        form {
-            display: flex;
-            justify-content: center;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .states,
-        .district {
-            border: 2px solid antiquewhite;
-            height: 30px;
-            font-weight: bold;
-            border-radius: 15px;
-            background-color: antiquewhite;
+        header {
+            background-color: #FF8C00;
+            color: white;
             text-align: center;
-            margin-bottom: 290px;
-            margin-top: 220px;
-            box-shadow: 1px 2px 6px 2px grey;
+            padding: 1rem;
         }
 
-        .district {
-            width: 160px;
+        h1 {
+            margin-bottom: 10px;
         }
 
-        select {
-            transition: max-height 0.5s ease;
-            margin-bottom: 200px;
+        .booking-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
-        .district-container {
-            display: none;
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #FF8C00;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e67e00;
         }
 
         #attractions-container {
-            border: 2px antiquewhite;
-            border-radius: 10px;
-            background-color: antiquewhite;
-            box-shadow: 1px 2px 6px 2px grey;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            align-items: center;
-            overflow: auto;
-            height: 170px;
-            margin-top: 160px;
-            max-width: 150%;
-        }
-
-        #search-hotels-btn {
-            height: 30px;
-            width: 140px;
-            margin-top: 220px;
-            display: flex;
-
-        }
-
-        #hotels-container {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .hotel-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            width: 300px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .hotel-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .book-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        #booking-modal {
             display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
         }
 
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
+        .attraction-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        .attraction-item input[type="checkbox"] {
+            margin-right: 10px;
         }
 
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .booking-form {
+                padding: 15px;
+            }
+        }
+        header h1{
+            margin-top: 150px;
         }
     </style>
 </head>
-
 <body>
-    <div class="booking-conatiner">
-        <form action="search_hotels.php" method="post">
-            <div class="dropdown">
-                <div class="state-container">
-                    <label for="states">
-                        <select name="states" id="states" onchange="updateDistricts()" class="states">
-                            <option value="">Select State</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Pradesh">Himachal Pradesh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                            <option value="Chandigarh">Chandigarh</option>
-                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman
-                                and
-                                Diu
-                            </option>
-                            <option value="Lakshadweep">Lakshadweep</option>
-                            <option value="Delhi">Delhi</option>
-                            <option value="Puducherry">Puducherry</option>
-                            <option value="Ladakh">Ladakh</option>
-                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                        </select>
-                    </label>
-                </div>
-                <div class="district-container" id="district-container" style="display: none;">
-                    <label for="districts">
-                        <select name="districts" id="districtdropdown" class="district">
-                            <option value="">Select District</option>
-                        </select>
-                    </label>
-                </div>
-                <div id="attractions-container" style="display: none;"></div>
-                <button type="submit" id="search-hotels-btn">Search Hotels</button>
+    <?php include('header.php'); ?>
+    <header>
+        <h1>TravelEase</h1>
+        <p>Discover Your Perfect Getaway</p>
+    </header>
 
-            </div>
-        </form>
+    <div class="container">
+        <div class="booking-form">
+            <form action="search_hotels.php" method="post">
+                <div class="form-group">
+                    <label for="states"><i class="fas fa-map-marker-alt"></i> Select State</label>
+                    <select name="states" id="states">
+                        <option value="">Choose a state</option>
+                        <!-- State options will be populated here -->
+                    </select>
+                </div>
+
+                <div class="form-group" id="district-container" style="display: none;">
+                    <label for="districts"><i class="fas fa-city"></i> Select District</label>
+                    <select name="districts" id="districtdropdown">
+                        <option value="">Choose a district</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-monument"></i> Popular Attractions</label>
+                    <div id="attractions-container"></div>
+                </div>
+
+                <button type="submit" id="search-hotels-btn">
+                    <i class="fas fa-search"></i> Find Hotels
+                </button>
+            </form>
+        </div>
     </div>
+
     <script>
-        const districtsByState = {
+                const districtsByState = {
             "Andhra Pradesh": ["Anantapur", "Chittoor", "East Godavari", "Guntur", "Krishna", "Kurnool", "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
             "Arunachal Pradesh": ["Anjaw", "Changlang", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Dibang Valley", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
             "Assam": ["Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup Metropolitan", "Kamrup", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tinsukia", "Udalguri", "West Karbi Anglong"],
@@ -820,39 +759,68 @@
             ]
         };
 
+        function populateStates() {
+            const stateDropdown = document.getElementById("states");
+            for (let state in districtsByState) {
+                const option = document.createElement("option");
+                option.value = state;
+                option.textContent = state;
+                stateDropdown.appendChild(option);
+            }
+        }
 
-        // Function to create checkboxes for attractions
+        function updateDistricts() {
+            const stateDropdown = document.getElementById("states");
+            const districtDropdown = document.getElementById("districtdropdown");
+            const districtContainer = document.getElementById("district-container");
+            const selectedState = stateDropdown.value;
+
+            districtDropdown.innerHTML = '<option value="">Choose a district</option>';
+
+            if (selectedState && districtsByState[selectedState]) {
+                districtsByState[selectedState].forEach(district => {
+                    const option = document.createElement("option");
+                    option.value = district;
+                    option.textContent = district;
+                    districtDropdown.appendChild(option);
+                });
+                districtContainer.style.display = "block";
+            } else {
+                districtContainer.style.display = "none";
+            }
+
+            document.getElementById('attractions-container').style.display = 'none';
+        }
+
         function createCheckboxes(attractions) {
             const container = document.getElementById('attractions-container');
             container.innerHTML = '';
 
             attractions.forEach(attraction => {
+                const attractionItem = document.createElement('div');
+                attractionItem.className = 'attraction-item';
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = attraction;
                 checkbox.value = attraction;
-                checkbox.name = 'attractions[]';  // Changed to array for multiple selections
+                checkbox.name = 'attractions[]';
 
                 const label = document.createElement('label');
                 label.htmlFor = attraction;
                 label.textContent = attraction;
 
-                const br = document.createElement('br');
-
-                container.appendChild(checkbox);
-                container.appendChild(label);
-                container.appendChild(br);
+                attractionItem.appendChild(checkbox);
+                attractionItem.appendChild(label);
+                container.appendChild(attractionItem);
             });
 
             container.style.display = 'block';
         }
 
-        // Function to handle district selection
         function updateAttractions() {
             const districtDropdown = document.getElementById('districtdropdown');
             const selectedDistrict = districtDropdown.value;
-
-            console.log('Selected District:', selectedDistrict);
 
             if (selectedDistrict) {
                 const attractions = touristAttractions[selectedDistrict];
@@ -867,38 +835,13 @@
             }
         }
 
+        // Event listeners
+        document.getElementById('states').addEventListener('change', updateDistricts);
         document.getElementById('districtdropdown').addEventListener('change', updateAttractions);
 
-        function updateDistricts() {
-            const stateDropdown = document.getElementById("states");
-            const districtDropdown = document.getElementById("districtdropdown");
-            const districtcontainer = document.getElementById("district-container");
-            const selectedState = stateDropdown.value;
-
-            console.log('Selected State:', selectedState);
-
-
-            districtDropdown.innerHTML = '<option value="">Select District</option>';
-
-            if (selectedState && districtsByState[selectedState]) {
-                districtsByState[selectedState].forEach(district => {
-                    const option = document.createElement("option");
-                    option.value = district;
-                    option.textContent = district;
-                    districtDropdown.appendChild(option);
-                });
-                districtcontainer.style.display = "block";
-            } else {
-                districtcontainer.style.display = "none";
-            }
-
-            // Hide attractions container when state is changed
-            document.getElementById('attractions-container').style.display = 'none';
-        }
-
-        // Add event listener to update districts on state change
-        document.getElementById('states').addEventListener('change', updateDistricts);
+        // Initialize the page
+        populateStates();
     </script>
+    <?php include('footer.php')?>
 </body>
-
 </html>

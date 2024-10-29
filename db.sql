@@ -11,6 +11,7 @@ CREATE TABLE events (
 );
 
 /*destinations table*/
+/*destinations table*/
 CREATE TABLE destinations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     filename VARCHAR(255) NOT NULL,
@@ -20,10 +21,9 @@ CREATE TABLE destinations (
     destination VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     price VARCHAR(50) NOT NULL,
-    hotel_name VARCHAR(255) NOT NULL,
-    hotel_url VARCHAR(255) NOT NULL,
     uploaded_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 /*user table*/
 create table userreg(name varchar(500),

@@ -3,29 +3,43 @@
 ini_set('display_errors', 1); */
 
 $msg = "";
+$db = mysqli_connect("localhost", "root", "", "tourmentor");
 
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Fetch data for the entered place ID
+if (isset($_POST['fetch_details'])) {
+    $destination_id = mysqli_real_escape_string($db, $_POST['destination_id']);
+    
+    $sql = "SELECT * FROM destinations WHERE id = '$destination_id'";
+    $result = mysqli_query($db, $sql);
+    
+    if ($result && mysqli_num_rows($result) > 0) {
+        $destination_data = mysqli_fetch_assoc($result);
+    } else {
+        $msg = "No destination found with this ID.";
+    }
+}
+
+// Update the details after fetching
 if (isset($_POST['update'])) {
+    $destination_id = mysqli_real_escape_string($db, $_POST['destination_id']);
+    $state = mysqli_real_escape_string($db, $_POST['state']);
+    $district = mysqli_real_escape_string($db, $_POST['district']);
+    $location = mysqli_real_escape_string($db, $_POST['location']);
+    $destination = mysqli_real_escape_string($db, $_POST['destination']);
+    $description = mysqli_real_escape_string($db, $_POST['description']);
+    $price = mysqli_real_escape_string($db, $_POST['price']);
+    
+    // Check if a new file was uploaded
     if (isset($_FILES['uploadfile']) && $_FILES['uploadfile']['error'] === UPLOAD_ERR_OK) {
         $filename = $_FILES["uploadfile"]["name"];
         $tempname = $_FILES["uploadfile"]["tmp_name"];
         $folder = "./image/" . $filename;
 
-        $db = mysqli_connect("localhost", "root", "", "tourmentor");
-
-        if (!$db) {
-            die("Connection failed: " . mysqli_connect_error());
-        }
-
-        $destination_id = mysqli_real_escape_string($db, $_POST['destination_id']);
-        $state = mysqli_real_escape_string($db, $_POST['state']);
-        $district = mysqli_real_escape_string($db, $_POST['district']);
-        $location = mysqli_real_escape_string($db, $_POST['location']);
-        $destination = mysqli_real_escape_string($db, $_POST['destination']);
-        $description = mysqli_real_escape_string($db, $_POST['description']);
-        $price = mysqli_real_escape_string($db, $_POST['price']);
-        $hotel_name = mysqli_real_escape_string($db, $_POST['hotel_name']);
-        $hotel_url = mysqli_real_escape_string($db, $_POST['hotel_url']);
-
+        // Update with new filename
         $sql = "UPDATE destinations SET
                 `filename` = '$filename',
                 `state` = '$state',
@@ -33,24 +47,34 @@ if (isset($_POST['update'])) {
                 `location` = '$location',
                 `destination` = '$destination',
                 `description` = '$description',
-                `price` = '$price',
-                `hotel_name` = '$hotel_name',
-                `hotel_url` = '$hotel_url'
-                WHERE `destination` = '$destination'";
-
+                `price` = '$price'
+                WHERE `id` = '$destination_id'";
+        
         if (mysqli_query($db, $sql)) {
             if (move_uploaded_file($tempname, $folder)) {
-                $msg = "Destination updated successfully!";
+                $msg = "Destination updated successfully with new file!";
             } else {
                 $msg = "Failed to upload file!";
             }
         } else {
             $msg = "Database error: " . mysqli_error($db);
         }
-
-        mysqli_close($db);
     } else {
-        $msg = "No file was uploaded or there was an upload error.";
+        // If no new file is uploaded, only update other fields
+        $sql = "UPDATE destinations SET
+                `state` = '$state',
+                `district` = '$district',
+                `location` = '$location',
+                `destination` = '$destination',
+                `description` = '$description',
+                `price` = '$price'
+                WHERE `id` = '$destination_id'";
+
+        if (mysqli_query($db, $sql)) {
+            $msg = "Destination updated successfully!";
+        } else {
+            $msg = "Database error: " . mysqli_error($db);
+        }
     }
 
     echo "<script>
@@ -65,7 +89,7 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update</title>
+    <title>Update Destination</title>
     <style>
         body {
             display: flex;
@@ -150,49 +174,64 @@ if (isset($_POST['update'])) {
 </head>
 <body>
     <div id="content">
-        <h2>Update</h2>
-        <form method="POST" action="" enctype="multipart/form-data">
+        <h2>Update Destination</h2>
+        
+        <!-- Form to fetch details using place id -->
+        <form method="POST" action="">
             <div class="details">
                 <div class="form-row">
                     <div>
-                        State Name:<input type="text" name="state" placeholder="Enter State Name">
+                        Enter Destination ID:<input type="text" name="destination_id" placeholder="Enter Destination ID" value="<?php echo isset($destination_data['id']) ? $destination_data['id'] : ''; ?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn-primary" type="submit" name="fetch_details">Fetch Details</button>
+                </div>
+            </div>
+        </form>
+        
+        <?php if (isset($destination_data)) { ?>
+        <!-- Form to update details -->
+        <form method="POST" action="" enctype="multipart/form-data">
+            <input type="hidden" name="destination_id" value="<?php echo $destination_data['id']; ?>">
+            
+            <div class="details">
+                <div class="form-row">
+                    <div>
+                        State Name:<input type="text" name="state" placeholder="Enter State Name" value="<?php echo $destination_data['state']; ?>">
                     </div>
                     <div>
-                        District Name:<input type="text" name="district" placeholder="Enter District Name">
+                        District Name:<input type="text" name="district" placeholder="Enter District Name" value="<?php echo $destination_data['district']; ?>">
                     </div>
                 </div>
                 <div class="form-row">
                     <div>
-                        Location:<input type="text" name="location" placeholder="Enter Location">
+                        Location:<input type="text" name="location" placeholder="Enter Location" value="<?php echo $destination_data['location']; ?>">
                     </div>
                     <div>
-                        Destination Name:<input type="text" name="destination" placeholder="Enter Destination">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div>
-                        Description:<input type="text" name="description" placeholder="Enter Description">
-                    </div>
-                    <div>
-                        Price:<input type="text" name="price" placeholder="Enter Price">
+                        Destination Name:<input type="text" name="destination" placeholder="Enter Destination" value="<?php echo $destination_data['destination']; ?>">
                     </div>
                 </div>
                 <div class="form-row">
                     <div>
-                        Nearest Hotel Name:<input type="text" name="hotel_name" placeholder="Enter Nearest Hotel Name">
+                        Description:<input type="text" name="description" placeholder="Enter Description" value="<?php echo $destination_data['description']; ?>">
                     </div>
                     <div>
-                        Hotel URL:<input type="url" name="hotel_url" placeholder="Enter Hotel URL">
+                        Price:<input type="text" name="price" placeholder="Enter Price" value="<?php echo $destination_data['price']; ?>">
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <input class="form-control" type="file" name="uploadfile" value="">
+                <input class="form-control" type="file" name="uploadfile">
+                <?php if (isset($destination_data['filename']) && !empty($destination_data['filename'])) { ?>
+                    <img src="./image/<?php echo $destination_data['filename']; ?>" alt="Current Image" style="max-width: 100px;">
+                <?php } ?>
             </div>
             <div class="form-group">
                 <button class="btn-primary" type="submit" name="update">UPDATE</button>
             </div>
         </form>
+        <?php } ?>
     </div>
 </body>
 </html>

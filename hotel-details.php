@@ -12,10 +12,8 @@ if (isset($_GET['id'])) {
 
 // Prepare and execute SQL query to fetch hotel details
 $sql = "SELECT h.id, h.name AS hotel_name, h.address, h.price_per_night, h.rating, h.picture_url,
-               rt.name AS room_type, rt.price_per_night AS room_price, rt.capacity, rt.description,
                ha.attractions_info
         FROM hotels h
-        LEFT JOIN room_types rt ON h.id = rt.hotel_id
         LEFT JOIN hotel_attractions ha ON h.id = ha.hotel_id
         WHERE h.id = ?";
 
@@ -32,6 +30,17 @@ if ($result->num_rows === 0) {
 
 // Fetch hotel details
 $hotel = $result->fetch_assoc();
+
+// Prepare and execute SQL query to fetch bookings for this hotel
+$sqlBookings = "SELECT b.guest_name, rt.name AS room_type, b.check_in, b.check_out, b.total_price, b.booking_date
+                FROM bookings b
+                LEFT JOIN room_types rt ON b.room_type_id = rt.id
+                WHERE b.hotel_id = ?";
+
+$stmtBookings = $conn->prepare($sqlBookings);
+$stmtBookings->bind_param('i', $hotel_id);
+$stmtBookings->execute();
+$bookingsResult = $stmtBookings->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -174,7 +183,6 @@ $hotel = $result->fetch_assoc();
 </head>
 
 <body>
-
     <div class="hotel-details">
         <h1><?php echo htmlspecialchars($hotel['hotel_name']); ?></h1>
         <img src="<?php echo htmlspecialchars($hotel['picture_url']); ?>" alt="<?php echo htmlspecialchars($hotel['hotel_name']); ?>" class="hotel-image">
@@ -182,32 +190,37 @@ $hotel = $result->fetch_assoc();
         <p><strong>Price per Night:</strong> $<?php echo number_format($hotel['price_per_night'], 2); ?></p>
         <p><strong>Rating:</strong> <?php echo htmlspecialchars($hotel['rating']); ?> / 5.0</p>
 
-        <h2>Room Types</h2>
+        <h2>Attractions</h2>
+        <p><?php echo htmlspecialchars($hotel['attractions_info']); ?></p>
+
+        <h2>Bookings</h2>
         <table>
             <tr>
+                <th>Guest Name</th>
                 <th>Room Type</th>
-                <th>Price per Night</th>
-                <th>Capacity</th>
-                <th>Description</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Total Price</th>
+                <th>Booking Date</th>
             </tr>
             <?php
-            // Reset the result pointer to fetch room types
-            $result->data_seek(0); // Reset pointer to fetch room types again
-            while ($room = $result->fetch_assoc()) {
-                if (!empty($room['room_type'])) { // Check if room type exists
+            // Check if there are any bookings
+            if ($bookingsResult->num_rows > 0) {
+                while ($booking = $bookingsResult->fetch_assoc()) {
                     echo "<tr>
-                        <td>" . htmlspecialchars($room['room_type']) . "</td>
-                        <td>$" . number_format($room['room_price'], 2) . "</td>
-                        <td>" . htmlspecialchars($room['capacity']) . "</td>
-                        <td>" . htmlspecialchars($room['description']) . "</td>
+                        <td>" . htmlspecialchars($booking['guest_name']) . "</td>
+                        <td>" . htmlspecialchars($booking['room_type']) . "</td>
+                        <td>" . htmlspecialchars($booking['check_in']) . "</td>
+                        <td>" . htmlspecialchars($booking['check_out']) . "</td>
+                        <td>$" . number_format($booking['total_price'], 2) . "</td>
+                        <td>" . htmlspecialchars($booking['booking_date']) . "</td>
                     </tr>";
                 }
+            } else {
+                echo "<tr><td colspan='6'>No bookings found for this hotel.</td></tr>";
             }
             ?>
         </table>
-
-        <h2>Attractions</h2>
-        <p><?php echo htmlspecialchars($hotel['attractions_info']); ?></p>
 
         <h2>Booking</h2>
         <form action="book.php" method="POST">
@@ -240,5 +253,6 @@ $hotel = $result->fetch_assoc();
 
 <?php
 $stmt->close();
+$stmtBookings->close();
 $conn->close();
 ?>
