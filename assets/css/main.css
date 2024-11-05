@@ -24,6 +24,7 @@ body {
   color: var(--color-default);
 }
 
+
 a {
   color: var(--color-primary);
   text-decoration: none;
@@ -286,6 +287,10 @@ section {
   background: rgba(206, 18, 18, 0.8);
 }
 
+.header .navbar a:active {
+  color: #ce1212;
+}
+
 /*--------------------------------------------------------------
 # Desktop Navigation
 --------------------------------------------------------------*/
@@ -344,6 +349,12 @@ section {
     visibility: hidden;
     width: 0px;
     transition: all 0.3s ease-in-out 0s;
+  }
+
+  .navbar .active,
+  .navbar .active:focus {
+    color: var(--color-primary);
+    font-weight: bold;
   }
 
   .navbar a:hover:before,
