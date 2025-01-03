@@ -46,14 +46,14 @@ $isLoggedIn = isset($_SESSION['user_email']);
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a href="index.php">Home</a></li>
-          <li><a href="search.php">Search</a></li>
-          <li><a href="booking.php">Hotels</a></li>
+          <li><a href="index.php" class="<?= basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : '' ?>">Home</a></li>
+          <li><a href="search.php" class="<?= basename($_SERVER['PHP_SELF']) == 'search.php' ? 'active' : '' ?>">Search</a></li>
+          <li><a href="booking.php" class="<?= basename($_SERVER['PHP_SELF']) == 'booking.php' ? 'active' : '' ?>">Hotels</a></li>
           <?php if ($isLoggedIn): ?>
-            <li><a href="profile.php">Profile</a></li>
-            <li><a href="logout.php">Logout</a></li>
+            <li><a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'active' : '' ?>">Profile</a></li>
+            <li><a href="logout.php" class="<?= basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : '' ?>">Logout</a></li>
           <?php else: ?>
-            <li><a href="login.php">Login</a></li>
+            <li><a href="login.php" class="<?= basename($_SERVER['PHP_SELF']) == 'login.php' ? 'active' : '' ?>">Login</a></li>
           <?php endif; ?>
         </ul>
       </nav><!-- .navbar -->

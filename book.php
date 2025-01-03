@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="form-group">
                     <label for="card_number">Card Number:</label>
-                    <input type="text" id="card_number" name="card_number" required>
+                    <input type="text" id="card_number" name="card_number" required pattern="\d{4} \d{4} \d{4} \d{4}" title="Please enter a valid 16 digit card number with spaces after every 4 digits" oninput="this.value=this.value.replace(/\s+/g, ' ').replace(/(\d{4})/g, '$1 ').trim().replace(/\s{2,}/g, ' ');">
                 </div>
                 <div class="form-group">
                     <label for="card_expiry">Card Expiry (MM/YY):</label>
