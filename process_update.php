@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $price = mysqli_real_escape_string($conn , $_POST['place_price']);
 
     // Validate inputs
-    if (empty($id) || empty($name) || empty($location)) {
+    if (empty($id) || empty($name) || empty($location) || empty($price)) {
         echo "<p>Error: Please fill in all required fields.</p>";
         exit;
     }
