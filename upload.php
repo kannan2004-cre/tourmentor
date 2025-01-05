@@ -65,136 +65,105 @@ if (isset($_POST['upload'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Upload</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #fff7e6;
-        }
-
-        #content {
-            background-color: #fff;
+        /* Scoped styles for upload form only */
+        .upload-container {
+            background: transparent !important;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .upload-container h2 {
             text-align: center;
-            animation: fadeIn 1s ease-in-out;
-            box-sizing: border-box;
+            margin-bottom: 2rem;
+            color: inherit;
         }
 
-        #content h2 {
-            margin-bottom: 20px;
-            color: #333;
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
+        .form-field {
+            margin-bottom: 1rem;
         }
 
-        .form-row div {
-            flex: 1;
-            margin-right: 10px;
+        .form-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: inherit;
         }
 
-        .form-row div:last-child {
-            margin-right: 0;
-        }
-
-        .details input[type="text"],
-        .details select,
-        .form-group input[type="file"] {
+        .form-field input[type="text"],
+        .form-field input[type="file"] {
             width: 100%;
-            padding: 8px;
-            margin: 8px 0;
-            border: 2px solid #ffa500;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
+            background: transparent;
+            border: 1px solid var(--pico-form-element-border-color);
         }
 
-        .btn-primary {
+        .file-upload {
+            margin: 1rem 0;
+        }
+
+        .submit-button {
             width: 100%;
-            padding: 10px;
-            background-color: #ffa500;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
+            margin-top: 1rem;
         }
 
-        .btn-primary:hover {
-            background-color: #e69500;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+        /* Preserve dark mode compatibility */
+        @media (prefers-color-scheme: dark) {
+            .upload-container {
+                color: inherit;
             }
         }
 
-        .details input:focus,
-        .details select:focus,
-        .form-group input:focus,
-        .btn-primary:focus {
-            outline: none;
-            box-shadow: 0 0 10px #ffa500;
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-
 <body>
-    <div id="content">
+    <div class="upload-container">
         <h2>Upload Your Image</h2>
         <form method="POST" action="" enctype="multipart/form-data">
-            <div class="details">
-                <div class="form-row">
-                    <div>
-                        State Name:<input type="text" name="state" placeholder="Enter State Name" required>
-                    </div>
-                    <div>
-                        District Name:<input type="text" name="district" placeholder="Enter District Name" required>
-                    </div>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="state">State Name</label>
+                    <input type="text" id="state" name="state" placeholder="Enter State Name" required>
                 </div>
-                <div class="form-row">
-                    <div>
-                        Location:<input type="text" name="location" placeholder="Enter Location" required>
-                    </div>
-                    <div>
-                        Destination Name:<input type="text" name="destination" placeholder="Enter Destination" required>
-                    </div>
+                <div class="form-field">
+                    <label for="district">District Name</label>
+                    <input type="text" id="district" name="district" placeholder="Enter District Name" required>
                 </div>
-                <div class="form-row">
-                    <div>
-                        Description:<input type="text" name="description" placeholder="Enter Description" required>
-                    </div>
-                    <div>
-                        Price:<input type="text" name="price" placeholder="Enter Price" required>
-                    </div>
+                <div class="form-field">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location" placeholder="Enter Location" required>
+                </div>
+                <div class="form-field">
+                    <label for="destination">Destination Name</label>
+                    <input type="text" id="destination" name="destination" placeholder="Enter Destination" required>
+                </div>
+                <div class="form-field">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" placeholder="Enter Description" required>
+                </div>
+                <div class="form-field">
+                    <label for="price">Price</label>
+                    <input type="text" id="price" name="price" placeholder="Enter Price" required>
                 </div>
             </div>
-            <div class="form-group">
-                <input class="form-control" type="file" name="uploadfile" value="" required />
+            <div class="file-upload">
+                <label for="uploadfile">Upload Image</label>
+                <input type="file" id="uploadfile" name="uploadfile" required>
             </div>
-            <div class="form-group">
-                <button class="btn btn-primary" type="submit" name="upload">UPLOAD</button>
-            </div>
+            <button type="submit" name="upload" class="submit-button">UPLOAD</button>
         </form>
     </div>
 </body>
