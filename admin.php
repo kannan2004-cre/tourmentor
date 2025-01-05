@@ -44,7 +44,7 @@
         }
 
         .display {
-            margin: 30px;
+            margin: 10px;
             flex-grow: 1;
             border: 1px solid #ccc;
             padding: 10px;
@@ -75,19 +75,16 @@
     </div>
 
     <script>
-        $(document).ready(function () {
-            $(".load-page").click(function () {
-                console.log("Button clicked!"); // Debugging log
+        $(document).ready(function() {
+            $(".load-page").click(function() {
                 const page = $(this).data("page");
-
-                // AJAX loading
-                $("#display-container").load(page, function (response, status, xhr) {
-                    if (status === "error") {
-                        $("#display-container").html("<p>Error loading page. Please try again.</p>");
+                $("#display-container").load(page, function(response, status, xhr) {
+                    if (status == "error") {
+                        $("#display-container").html("<p>error loading page!</p>");
                     }
-                });
-            });
-        });
+                })
+            })
+        })
     </script>
 </body>
 
