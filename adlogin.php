@@ -19,7 +19,7 @@ if (isset($_POST['login'])) {
         $error_message = "Database connection failed!";
     } else {
         $valid_email = 'admin2024@gmail.com';
-        $valid_password = 'admin#123';
+        $valid_password = 'Admin2024#';
 
         // In a real-world scenario, you should use password_hash() and password_verify()
         if ($email === $valid_email && $pass === $valid_password) {
