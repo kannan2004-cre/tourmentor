@@ -1,8 +1,8 @@
 <?php
-// Manual connection to the database
+// Database connection
 $servername = "localhost";
 $username = "root";
-$password = ""; // No password
+$password = ""; 
 $dbname = "tourmentor";
 
 // Create connection
@@ -13,17 +13,19 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch data from events table
+// Fetch data from tables
 $events_sql = "SELECT * FROM events";
 $events_result = $conn->query($events_sql);
 
-// Fetch data from destinations table
 $destinations_sql = "SELECT * FROM destinations";
 $destinations_result = $conn->query($destinations_sql);
 
-// Fetch data from reviews table
 $reviews_sql = "SELECT * FROM reviews";
 $reviews_result = $conn->query($reviews_sql);
+
+// Fetch hotel data
+$hotels_sql = "SELECT * FROM hotels";
+$hotels_result = $conn->query($hotels_sql);
 ?>
 
 <!DOCTYPE html>
@@ -31,19 +33,20 @@ $reviews_result = $conn->query($reviews_sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Page</title>
+    <title>View Data</title>
     <style>
+        /* Reset background to be transparent to maintain Pico's theme */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background: transparent !important;
+            color: inherit !important;
             margin: 0;
             padding: 0;
         }
 
         h1 {
             text-align: center;
-            color: #007bff;
+            color: inherit;
             margin-top: 20px;
         }
 
@@ -51,9 +54,10 @@ $reviews_result = $conn->query($reviews_sql);
             max-width: 1100px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: transparent !important;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
+            border: 1px solid var(--pico-form-element-border-color);
         }
 
         .section {
@@ -61,9 +65,9 @@ $reviews_result = $conn->query($reviews_sql);
         }
 
         .section h2 {
-            border-left: 5px solid #007bff;
+            border-left: 5px solid var(--pico-primary);
             padding-left: 10px;
-            color: #333;
+            color: inherit;
             font-size: 1.8em;
             margin-bottom: 10px;
         }
@@ -72,17 +76,19 @@ $reviews_result = $conn->query($reviews_sql);
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            background: transparent !important;
         }
 
         th, td {
             padding: 10px;
             text-align: left;
-            border: 1px solid #ddd;
+            border: 1px solid var(--pico-form-element-border-color);
+            color: inherit;
         }
 
         th {
-            background-color: #007bff;
-            color: white;
+            background-color: var(--pico-primary);
+            color: var(--pico-primary-inverse);
         }
 
         td img {
@@ -92,14 +98,52 @@ $reviews_result = $conn->query($reviews_sql);
 
         .no-data {
             text-align: center;
-            color: #999;
+            color: var(--pico-muted-color);
             padding: 20px;
         }
 
-        /* Responsive Design */
+        /* Links should use theme colors */
+        a {
+            color: var(--pico-primary);
+        }
+
+        a:hover {
+            color: var(--pico-primary-hover);
+        }
+
+        /* Preserve transparency for nested elements */
+        .section, .container * {
+            background: transparent !important;
+        }
+
+        /* Actions column styling */
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .actions button {
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: var(--pico-primary);
+            color: var(--pico-primary-inverse);
+            border: none;
+            border-radius: 4px;
+        }
+
+        .actions button.delete {
+            background-color: var(--pico-destructive);
+        }
+
         @media (max-width: 768px) {
             table, th, td {
                 font-size: 0.9em;
+            }
+            
+            /* Make tables scrollable on mobile */
+            .table-container {
+                overflow-x: auto;
             }
         }
     </style>
@@ -108,35 +152,36 @@ $reviews_result = $conn->query($reviews_sql);
 
 <h1>Data Overview</h1>
 <div class="container">
-
     <!-- Events Section -->
     <div class="section">
         <h2>Events</h2>
         <?php if ($events_result && $events_result->num_rows > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Event Name</th>
-                        <th>Description</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Location</th>
-                        <th>URL</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($event = $events_result->fetch_assoc()): ?>
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($event['event_name']); ?></td>
-                            <td><?php echo htmlspecialchars($event['event_description']); ?></td>
-                            <td><?php echo htmlspecialchars($event['event_start_date']); ?></td>
-                            <td><?php echo htmlspecialchars($event['event_end_date']); ?></td>
-                            <td><?php echo htmlspecialchars($event['location']); ?></td>
-                            <td><a href="<?php echo htmlspecialchars($event['event_url']); ?>" target="_blank">Link</a></td>
+                            <th>Event Name</th>
+                            <th>Description</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Location</th>
+                            <th>URL</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php while ($event = $events_result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($event['event_name']); ?></td>
+                                <td><?php echo htmlspecialchars($event['event_description']); ?></td>
+                                <td><?php echo htmlspecialchars($event['event_start_date']); ?></td>
+                                <td><?php echo htmlspecialchars($event['event_end_date']); ?></td>
+                                <td><?php echo htmlspecialchars($event['location']); ?></td>
+                                <td><a href="<?php echo htmlspecialchars($event['event_url']); ?>" target="_blank">Link</a></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
             <p class="no-data">No events found.</p>
         <?php endif; ?>
@@ -146,34 +191,69 @@ $reviews_result = $conn->query($reviews_sql);
     <div class="section">
         <h2>Destinations</h2>
         <?php if ($destinations_result && $destinations_result->num_rows > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>State</th>
-                        <th>District</th>
-                        <th>Location</th>
-                        <th>Destination</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($destination = $destinations_result->fetch_assoc()): ?>
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($destination['state']); ?></td>
-                            <td><?php echo htmlspecialchars($destination['district']); ?></td>
-                            <td><?php echo htmlspecialchars($destination['location']); ?></td>
-                            <td><?php echo htmlspecialchars($destination['destination']); ?></td>
-                            <td><?php echo htmlspecialchars($destination['description']); ?></td>
-                            <td><?php echo htmlspecialchars($destination['price']); ?></td>
-                            <td><img src="uploads/<?php echo htmlspecialchars($destination['filename']); ?>" alt="Destination Image"></td>
+                            <th>State</th>
+                            <th>District</th>
+                            <th>Location</th>
+                            <th>Destination</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Image</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php while ($destination = $destinations_result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($destination['state']); ?></td>
+                                <td><?php echo htmlspecialchars($destination['district']); ?></td>
+                                <td><?php echo htmlspecialchars($destination['location']); ?></td>
+                                <td><?php echo htmlspecialchars($destination['destination']); ?></td>
+                                <td><?php echo htmlspecialchars($destination['description']); ?></td>
+                                <td><?php echo htmlspecialchars($destination['price']); ?></td>
+                                <td><img src="uploads/<?php echo htmlspecialchars($destination['filename']); ?>" alt="Destination Image"></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
             <p class="no-data">No destinations found.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Hotels Section -->
+    <div class="section">
+        <h2>Hotels</h2>
+        <?php if ($hotels_result && $hotels_result->num_rows > 0): ?>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hotel Name</th>
+                            <th>Address</th>
+                            <th>Price</th>
+                            <th>Rating(/5)</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($hotel = $hotels_result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($hotel['name']); ?></td>
+                                <td><?php echo htmlspecialchars($hotel['address']); ?></td>
+                                <td><?php echo htmlspecialchars($hotel['price_per_night']); ?></td>
+                                <td><?php echo htmlspecialchars($hotel['rating']); ?></td>
+                                <td><img src="uploads/<?php echo htmlspecialchars($hotel['picture_url']); ?>" alt="Hotel Image"></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <p class="no-data">No hotels found.</p>
         <?php endif; ?>
     </div>
 
@@ -181,26 +261,28 @@ $reviews_result = $conn->query($reviews_sql);
     <div class="section">
         <h2>Reviews</h2>
         <?php if ($reviews_result && $reviews_result->num_rows > 0): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Title</th>
-                        <th>Review</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($review = $reviews_result->fetch_assoc()): ?>
+            <div class="table-container">
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo htmlspecialchars($review['name']); ?></td>
-                            <td><?php echo htmlspecialchars($review['email']); ?></td>
-                            <td><?php echo htmlspecialchars($review['title']); ?></td>
-                            <td><?php echo htmlspecialchars($review['review']); ?></td>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Title</th>
+                            <th>Review</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php while ($review = $reviews_result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($review['name']); ?></td>
+                                <td><?php echo htmlspecialchars($review['email']); ?></td>
+                                <td><?php echo htmlspecialchars($review['title']); ?></td>
+                                <td><?php echo htmlspecialchars($review['review']); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         <?php else: ?>
             <p class="no-data">No reviews found.</p>
         <?php endif; ?>
