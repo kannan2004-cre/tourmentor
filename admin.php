@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+// Check if the user is logged in as admin
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header("Location: adlogin.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

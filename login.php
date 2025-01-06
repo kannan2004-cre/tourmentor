@@ -1,7 +1,8 @@
 <?php
 include('header.php');
 
-function debug_to_console($data) {
+function debug_to_console($data)
+{
     echo "<script>console.log('" . addslashes(is_array($data) ? implode(',', $data) : $data) . "');</script>";
 }
 
@@ -16,32 +17,36 @@ if (isset($_POST['submit'])) {
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
-
-    $stmt = mysqli_prepare($conn, "SELECT * FROM userreg WHERE email = ?");
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        if (password_verify($password, $row['password'])) {
-            $_SESSION['loggedin'] = true;
-            $_SESSION['user_email'] = $row['email'];
-            $_SESSION['user_name'] = $row['name'];
-            $_SESSION['user_profile_pic'] = $row['filename'];
-
-            debug_to_console("Login successful for: " . $email);
-            echo "<script>alert('Welcome to Tourmentor!'); window.location.href = 'index.php';</script>";
-            exit();
+    if (!empty($email) && !empty($password)) {
+        if(!filter_var(($email),FILTER_VALIDATE_EMAIL)) {
+            $email_error = "please enter a valid email";
         } else {
-            $password_error = "Invalid password. Please try again.";
-            debug_to_console("Invalid password for: " . $email);
-        }
-    } else {
-        $email_error = "Invalid email. Please try again.";
-        debug_to_console("Invalid email: " . $email);
-    }
+            $stmt = mysqli_prepare($conn, "SELECT * FROM userreg WHERE email = ?");
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
+            if ($result && mysqli_num_rows($result) > 0) {
+                $row = mysqli_fetch_assoc($result);
+                if (password_verify($password, $row['password'])) {
+                    $_SESSION['loggedin'] = true;
+                    $_SESSION['user_email'] = $row['email'];
+                    $_SESSION['user_name'] = $row['name'];
+                    $_SESSION['user_profile_pic'] = $row['filename'];
+
+                    debug_to_console("Login successful for: " . $email);
+                    echo "<script>alert('Welcome to Tourmentor!'); window.location.href = 'index.php';</script>";
+                    exit();
+                } else {
+                    $password_error = "Invalid password. Please try again.";
+                    debug_to_console("Invalid password for: " . $email);
+                }
+            } else {
+                $email_error = "Invalid email. Please try again.";
+                debug_to_console("Invalid email: " . $email);
+            }
+        }
+    }
     mysqli_close($conn);
 }
 ?>
@@ -95,6 +100,7 @@ if (isset($_POST['submit'])) {
         }
 
         @keyframes blink-caret {
+
             from,
             to {
                 border-color: transparent;
