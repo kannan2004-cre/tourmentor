@@ -7,6 +7,12 @@ if (isset($_POST['submit'])) {
 	if (!$conn) {
 		die("connection failed");
 	}
+	if(empty($name) && empty($email) && empty($password)){
+		echo"<script>alert('please fill every fields');</script>";
+	}
+	if(!filter_var(($email),FILTER_VALIDATE_EMAIL)){
+		echo"<script>alert('please enter valid email');</script>";
+	}
 	if (strlen($password) < 8 || !preg_match("/[0-9]/", $password)  || !preg_match("/[\W]/", $password)) {
 		echo "<script>alert('Password must be at least 8 characters long, include at least one number and a special character.');</script>";
 		echo "<script>window.location.href = 'signup.php';</script>";
@@ -27,19 +33,28 @@ if (isset($_POST['submit'])) {
 				$filename = null;
 			}
 		}
-
-		$sql = "INSERT INTO userreg (`name`, `email`, `password`, `filename`) VALUES (?, ?, ?, ?)";
+		$sql = "SELECT * FROM userreg WHERE email = ?";
 		$stmt = mysqli_prepare($conn, $sql);
-		mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $hpass, $filename);
+		mysqli_stmt_bind_param($stmt, "s", $email);
+		mysqli_stmt_execute($stmt);
+		$result = mysqli_stmt_get_result($stmt);
+		$r = mysqli_fetch_assoc($result);
+		if (!$r) {
+			$sql = "INSERT INTO userreg (`name`, `email`, `password`, `filename`) VALUES (?, ?, ?, ?)";
+			$stmt = mysqli_prepare($conn, $sql);
+			mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $hpass, $filename);
 
-		if (mysqli_stmt_execute($stmt)) {
-			echo "<script>alert('Registered successfully');</script>";
-			echo "<script>window.location.href = 'login.php';</script>";
-		} else {
-			echo "<script>alert('OOPS! Registration failed. Error: " . mysqli_error($conn) . "');</script>";
-			echo "<script>window.location.href = 'signup.php';</script>";
+			if (mysqli_stmt_execute($stmt)) {
+				echo "<script>alert('Registered successfully');</script>";
+				echo "<script>window.location.href = 'login.php';</script>";
+			} else {
+				echo "<script>alert('OOPS! Registration failed. Error: " . mysqli_error($conn) . "');</script>";
+				echo "<script>window.location.href = 'signup.php';</script>";
+			}
+			mysqli_stmt_close($stmt);
+		}else{
+			echo "<script>alert('Email already exists. Please login or use a different email.');</script>";
 		}
-		mysqli_stmt_close($stmt);
 	}
 	mysqli_close($conn);
 }

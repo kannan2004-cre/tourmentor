@@ -39,10 +39,10 @@ $sql = "SELECT b.id, h.name AS hotel_name, h.address, rt.name AS room_type, b.ch
         FROM bookings b
         INNER JOIN hotels h ON b.hotel_id = h.id
         INNER JOIN room_types rt ON b.room_type_id = rt.id
-        WHERE b.guest_name = ?";
+        WHERE b.email = ?";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param('s', $name); // Binding the user's name from the session
+$stmt->bind_param('s', $email); // Binding the user's name from the session
 $stmt->execute();
 $result = $stmt->get_result();
 

@@ -14,7 +14,7 @@ function debug_to_console($data)
     echo "<script>console.log('" . addslashes($output) . "');</script>";
 }
 
-$email_error = $name_error = ""; // Initialize error messages
+$email_error = $name_error = $profile_pic_error = ""; // Initialize error messages
 
 // Check if the user is logged in
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -46,6 +46,7 @@ if ($result && mysqli_num_rows($result) > 0) {
 if (isset($_POST['update'])) {
     $name = $_POST['name'];
     $new_email = $_POST['email'];
+    $profile_pic = $_FILES['profilepic']['name'];
 
     // Validate inputs
     if (empty($name)) {
@@ -55,16 +56,32 @@ if (isset($_POST['update'])) {
     if (empty($new_email)) {
         $email_error = "Email cannot be empty.";
     }
+    if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
+        $email_error = "Invalid email format.";
+    }
+
+    // Handle profile picture upload
+    if (!empty($profile_pic)) {
+        $tempname = $_FILES['profilepic']['tmp_name'];
+        $folder = "./uimages/" . $profile_pic;
+
+        if (!move_uploaded_file($tempname, $folder)) {
+            $profile_pic_error = "Failed to upload profile picture.";
+        }
+    } else {
+        $profile_pic = $user_data['filename']; // Keep existing picture if no new one is uploaded
+    }
 
     // Update user details if no errors
-    if (empty($name_error) && empty($email_error)) {
-        $sql = "UPDATE userreg SET name = ?, email = ? WHERE email = ?";
+    if (empty($name_error) && empty($email_error) && empty($profile_pic_error)) {
+        $sql = "UPDATE userreg SET name = ?, email = ?, filename = ? WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sss", $name, $new_email, $email);
+        mysqli_stmt_bind_param($stmt, "ssss", $name, $new_email, $profile_pic, $email);
         if (mysqli_stmt_execute($stmt)) {
             // Update session variables
             $_SESSION['user_email'] = $new_email;
             $_SESSION['user_name'] = $name;
+            $_SESSION['user_profile_pic'] = $profile_pic;
 
             echo "<script>alert('Profile updated successfully!');</script>";
             echo "<script>window.location.href = 'profile.php';</script>";
@@ -113,7 +130,8 @@ if (isset($_POST['update'])) {
         }
 
         .profile-edit-container input[type="text"],
-        .profile-edit-container input[type="email"] {
+        .profile-edit-container input[type="email"],
+        .profile-edit-container input[type="file"] {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -167,11 +185,13 @@ if (isset($_POST['update'])) {
 <body>
     <div class="profile-edit-container">
         <h2>Edit Profile</h2>
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
             <input type="text" name="name" placeholder="Name" value="<?php echo htmlspecialchars($user_data['name']); ?>" required>
             <?php if (!empty($name_error)) echo "<div class='error-message'>$name_error</div>"; ?>
             <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($user_data['email']); ?>" required>
             <?php if (!empty($email_error)) echo "<div class='error-message'>$email_error</div>"; ?>
+            <input type="file" name="profilepic">
+            <?php if (!empty($profile_pic_error)) echo "<div class='error-message'>$profile_pic_error</div>"; ?>
             <button type="submit" name="update">Update Profile</button>
         </form>
     </div>
