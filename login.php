@@ -1,29 +1,23 @@
 <?php
 include('header.php');
 
-// Function to safely output debug information
-function debug_to_console($data)
-{
-    $output = $data;
-    if (is_array($output))
-        $output = implode(',', $output);
-
-    echo "<script>console.log('" . addslashes($output) . "');</script>";
+function debug_to_console($data) {
+    echo "<script>console.log('" . addslashes(is_array($data) ? implode(',', $data) : $data) . "');</script>";
 }
 
-$email_error = $password_error = ""; // Initialize error messages
+$email_error = $password_error = "";
 
 if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['pass'];
     debug_to_console("Login attempt for email: " . $email);
+
     $conn = mysqli_connect("localhost", "root", "", "tourmentor");
     if (!$conn) {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    $sql = "SELECT * FROM userreg WHERE email = ?";
-    $stmt = mysqli_prepare($conn, $sql);
+    $stmt = mysqli_prepare($conn, "SELECT * FROM userreg WHERE email = ?");
     mysqli_stmt_bind_param($stmt, "s", $email);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -31,17 +25,13 @@ if (isset($_POST['submit'])) {
     if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         if (password_verify($password, $row['password'])) {
-            // Set session variables
-            $_SESSION['loggedin']=true;
+            $_SESSION['loggedin'] = true;
             $_SESSION['user_email'] = $row['email'];
             $_SESSION['user_name'] = $row['name'];
             $_SESSION['user_profile_pic'] = $row['filename'];
 
             debug_to_console("Login successful for: " . $email);
-            debug_to_console("Profile picture filename: " . $row['filename']);
-
-            echo "<script>alert('Welcome to Tourmentor!');</script>";
-            echo "<script>window.location.href = 'index.php';</script>";
+            echo "<script>alert('Welcome to Tourmentor!'); window.location.href = 'index.php';</script>";
             exit();
         } else {
             $password_error = "Invalid password. Please try again.";

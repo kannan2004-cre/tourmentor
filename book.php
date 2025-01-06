@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Database connection
 $host = 'localhost';
 $username = 'root';
@@ -22,37 +23,67 @@ $hotel = mysqli_fetch_assoc($hotel_result);
 $room_query = "SELECT * FROM room_types WHERE hotel_id = $hotel_id";
 $room_result = mysqli_query($conn, $room_query);
 
+$card_number_error = $card_expiry_error = $card_cvv_error = "";
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Process booking (in a real application, you'd want to validate inputs and handle payments securely)
     $room_type_id = $_POST['room_type'];
     $check_in = $_POST['check_in'];
+    $email = $_SESSION['user_email'];
     $check_out = $_POST['check_out'];
     $guest_name = $_POST['guest_name'];
     $card_number = $_POST['card_number'];
     $card_expiry = $_POST['card_expiry'];
     $card_cvv = $_POST['card_cvv'];
 
-    // Fetch the price for the selected room type
-    $price_query = "SELECT price_per_night FROM room_types WHERE id = $room_type_id";
-    $price_result = mysqli_query($conn, $price_query);
-    $price_row = mysqli_fetch_assoc($price_result);
-    $price_per_night = $price_row['price_per_night'];
+    // Validate card number
+    if (!preg_match('/^\d{4} \d{4} \d{4} \d{4}$/', $card_number)) {
+        $card_number_error = "Invalid card number. Please enter a valid 16 digit card number with spaces after every 4 digits.";
+    }
 
-    // Calculate total price (assuming check-in and check-out are in the correct format)
-    $check_in_date = new DateTime($check_in);
-    $check_out_date = new DateTime($check_out);
-    $nights = $check_out_date->diff($check_in_date)->days;
-    $total_price = $price_per_night * $nights;
-
-    // Insert booking into database (simplified, you'd want more error handling and security measures)
-    $booking_query = "INSERT INTO bookings (hotel_id, room_type_id, guest_name, check_in, check_out, total_price) 
-                      VALUES ($hotel_id, $room_type_id, '$guest_name', '$check_in', '$check_out', $total_price)";
-    if (mysqli_query($conn, $booking_query)) {
-        echo "<script>alert('Booking successful!'); window.location.href = 'booking_confirmation.php?booking_id=" . mysqli_insert_id($conn) . "';</script>";
-        exit;
+    // Validate card expiry
+    if (!preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $card_expiry)) {
+        $card_expiry_error = "Invalid card expiry date. Please enter a valid expiry date in MM/YY format.";
     } else {
-        echo "<script>alert('Booking failed. Please try again.');</script>";
+        $currentYear = date('y');
+        $currentMonth = date('m');
+        list($expMonth, $expYear) = explode('/', $card_expiry);
+        if ($expYear < $currentYear || ($expYear == $currentYear && $expMonth < $currentMonth)) {
+            $card_expiry_error = "Card expiry date cannot be in the past.";
+        }
+    }
+
+    // Validate CVV
+    if (!preg_match('/^\d{3,4}$/', $card_cvv)) {
+        $card_cvv_error = "Invalid CVV. Please enter a valid 3 or 4 digit CVV.";
+    }
+
+    if (empty($card_number_error) && empty($card_expiry_error) && empty($card_cvv_error)) {
+        // Fetch the price for the selected room type
+        $price_query = "SELECT price_per_night FROM room_types WHERE id = $room_type_id";
+        $price_result = mysqli_query($conn, $price_query);
+        $price_row = mysqli_fetch_assoc($price_result);
+        $price_per_night = $price_row['price_per_night'];
+
+        // Calculate total price 
+        $check_in_date = new DateTime($check_in);
+        $check_out_date = new DateTime($check_out);
+        $nights = $check_out_date->diff($check_in_date)->days;
+        $total_price = $price_per_night * $nights;
+
+        // Insert booking into database 
+        $booking_query = "INSERT INTO bookings (hotel_id, room_type_id, guest_name, check_in, check_out, total_price, email) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $booking_query);
+        mysqli_stmt_bind_param($stmt, 'iisssds', $hotel_id, $room_type_id, $guest_name, $check_in, $check_out, $total_price, $email);
+        if (mysqli_stmt_execute($stmt)) {
+            echo "<script>alert('Booking successful!'); window.location.href = 'booking_confirmation.php?booking_id=" . mysqli_insert_id($conn) . "';</script>";
+            exit;
+        } else {
+            echo "<script>alert('Booking failed. Please try again.');</script>";
+        }
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
@@ -111,6 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-size: 16px;
         }
 
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
         .submit-btn {
             background-color: #2196f3;
             color: white;
@@ -164,14 +201,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="form-group">
                     <label for="card_number">Card Number:</label>
                     <input type="text" id="card_number" name="card_number" required pattern="\d{4} \d{4} \d{4} \d{4}" title="Please enter a valid 16 digit card number with spaces after every 4 digits" oninput="this.value=this.value.replace(/\s+/g, ' ').replace(/(\d{4})/g, '$1 ').trim().replace(/\s{2,}/g, ' ');">
+                    <?php if (!empty($card_number_error)) echo "<div class='error-message'>$card_number_error</div>"; ?>
                 </div>
                 <div class="form-group">
                     <label for="card_expiry">Card Expiry (MM/YY):</label>
-                    <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY" required>
+                    <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])\/\d{2}" title="Please enter a valid expiry date in MM/YY format">
+                    <?php if (!empty($card_expiry_error)) echo "<div class='error-message'>$card_expiry_error</div>"; ?>
                 </div>
                 <div class="form-group">
                     <label for="card_cvv">CVV:</label>
-                    <input type="text" id="card_cvv" name="card_cvv" required>
+                    <input type="text" id="card_cvv" name="card_cvv" required pattern="\d{3,4}" title="Please enter a valid 3 or 4 digit CVV">
+                    <?php if (!empty($card_cvv_error)) echo "<div class='error-message'>$card_cvv_error</div>"; ?>
                 </div>
                 <input type="submit" value="Pay and Book" class="submit-btn">
             </form>
