@@ -1,4 +1,5 @@
 <?php
+$name_error = $email_error = $password_error = "";
 if (isset($_POST['submit'])) {
 	$name = $_POST['name'];
 	$email = $_POST['email'];
@@ -7,17 +8,21 @@ if (isset($_POST['submit'])) {
 	if (!$conn) {
 		die("connection failed");
 	}
-	if(empty($name) && empty($email) && empty($password)){
-		echo"<script>alert('please fill every fields');</script>";
+	if(empty($name)){
+		$name_error = "Please fill in your name.";
 	}
-	if(!filter_var(($email),FILTER_VALIDATE_EMAIL)){
-		echo"<script>alert('please enter valid email');</script>";
+	if(empty($email)){
+		$email_error = "Please fill in your email.";
+	} elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+		$email_error = "Please enter a valid email.";
 	}
-	if (strlen($password) < 8 || !preg_match("/[0-9]/", $password)  || !preg_match("/[\W]/", $password)) {
-		echo "<script>alert('Password must be at least 8 characters long, include at least one number and a special character.');</script>";
-		echo "<script>window.location.href = 'signup.php';</script>";
-		exit(0);
-	} else {
+	if(empty($password)){
+		$password_error = "Please fill in your password.";
+	} elseif (strlen($password) < 8 || !preg_match("/[0-9]/", $password) || !preg_match("/[\W]/", $password) || !preg_match("/[A-Z]/", $password) || !preg_match("/[a-z]/", $password)) {
+		$password_error = "Password must be at least 8 characters long, include at least one number, one special character, one uppercase letter, and one lowercase letter.";
+	}
+
+	if(empty($name_error) && empty($email_error) && empty($password_error)){
 		$hpass = password_hash($password, PASSWORD_DEFAULT);
 
 		$filename = null;
@@ -53,7 +58,7 @@ if (isset($_POST['submit'])) {
 			}
 			mysqli_stmt_close($stmt);
 		}else{
-			echo "<script>alert('Email already exists. Please login or use a different email.');</script>";
+			$email_error = "Email already exists. Please login or use a different email.";
 		}
 	}
 	mysqli_close($conn);
@@ -82,7 +87,7 @@ if (isset($_POST['submit'])) {
 
 		#content {
 			background-color: #fff;
-			padding: 20px;
+			padding: 40px;
 			border-radius: 10px;
 			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 			/* Light shadow effect */
@@ -108,14 +113,13 @@ if (isset($_POST['submit'])) {
 
 		.details .form-group {
 			display: flex;
-			align-items: center;
+			flex-direction: column;
 			width: 100%;
 			margin-bottom: 10px;
 		}
 
 		.details label {
-			width: 100px;
-			margin-right: 10px;
+			margin-bottom: 5px;
 			font-size: 14px;
 			color: #333;
 		}
@@ -124,12 +128,17 @@ if (isset($_POST['submit'])) {
 		.details input[type="email"],
 		.details input[type="password"],
 		.form-group input[type="file"] {
-			flex-grow: 1;
 			padding: 8px;
 			border: 2px solid #ffa500;
 			/* Orange border */
 			border-radius: 5px;
 			font-size: 14px;
+		}
+
+		.error {
+			color: red;
+			font-size: 12px;
+			margin-top: 5px;
 		}
 
 		.btn-primary {
@@ -266,14 +275,17 @@ if (isset($_POST['submit'])) {
 				<div class="form-group">
 					<label for="name">Name:</label>
 					<input type="text" id="name" name="name" placeholder="Enter Name" required>
+					<?php if (!empty($name_error)) echo '<div class="error">' . $name_error . '</div>'; ?>
 				</div>
 				<div class="form-group">
 					<label for="email">Email:</label>
 					<input type="email" id="email" name="email" placeholder="Enter Email" required>
+					<?php if (!empty($email_error)) echo '<div class="error">' . $email_error . '</div>'; ?>
 				</div>
 				<div class="form-group">
 					<label for="password">Password:</label>
 					<input type="password" id="password" name="pass" placeholder="Enter Password" required>
+					<?php if (!empty($password_error)) echo '<div class="error">' . $password_error . '</div>'; ?>
 				</div>
 				<div class="form-group">
 					<label for="profilepic">Profile Picture:</label>
@@ -285,7 +297,7 @@ if (isset($_POST['submit'])) {
 			</div>
 			<a href="login.php">Already have an account? Login</a>
 		</form>
-	</div
+	</div>
 		</div>
 </body>
 
