@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // If not logged in, redirect to admin login page
+    echo "Not logged in. Redirecting...";
+    header("Location: adlogin.php");
+    exit();
+}
+
+// Rest of your HTML code follows...
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,86 +20,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
-        body {
-            margin: 0px;
-            padding: 0px;
-        }
-
-        .maincontainer {
-            display: flex;
-        }
-
-        .sidebar {
-            border-right: 2px solid antiquewhite;
-            width: 300px;
-            height: 110vh;
-            margin: 0px;
-        }
-
-        .heading h2 {
-            margin-top: 0px;
-            padding-top: 40px;
+        h1 {
             text-align: center;
-            color: aliceblue;
+            color: antiquewhite;
+            font-size: 50px;
+            margin-top: 100px;
         }
 
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
+        p {
+            font-size: 30px;
+            text-align: center;
         }
 
-        button a {
-            color: aliceblue;
-            text-decoration: none;
-        }
-
-        .display {
+        button {
+            color: white;
             margin: 10px;
-            flex-grow: 1;
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 100vh;
-            overflow-y: auto;
+            border-radius: 10px;
+        }
+
+        button:hover {
+            background-color: rgb(7, 18, 28);
+            color: rgb(247, 243, 243);
+        }
+
+        .admin-panel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 50px;
+            gap: 10px;
+        }
+
+        .admin-panel a {
+            text-decoration: none;
+            color: aliceblue;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: aliceblue;
         }
     </style>
 </head>
 
 <body>
-    <div class="maincontainer">
-        <div class="sidebar">
-            <div class="heading">
-                <h2>Admin Panel</h2>
-            </div>
-
-            <div class="buttons">
-                <button class="load-page" data-page="upload.php">Upload Place</button><br>
-                <button class="load-page" data-page="hotelinsert.php">Insert Hotels</button><br>
-                <button class="load-page" data-page="update.php">Update Place</button><br>
-                <button class="load-page" data-page="view.php">View Data's</button><br>
-                <button><a href="adlogout.php">Logout</a></button>
-            </div>
-        </div>
-        <div class="display" id="display-container">
-            Select an option to load content.
-        </div>
+    <div class="navbar">
+        <ul>
+            <button><a href="index.php">Back to home</a></button>
+        </ul>
     </div>
-
-    <script>
-        $(document).ready(function() {
-            $(".load-page").click(function() {
-                const page = $(this).data("page");
-                $("#display-container").load(page, function(response, status, xhr) {
-                    if (status == "error") {
-                        $("#display-container").html("<p>error loading page!</p>");
-                    }
-                })
-            })
-        })
-    </script>
+    <h1>Admin Panel</h1>
+    <p>Welcome to the admin panel!</p>
+    <div class="admin-panel">
+        <button class="upload"><a href="upload.php">Upload</a></button><br>
+        <button class="hotel"><a href="hotelinsert.php">Insert Hotels</a></button>
+        <button class="update"><a href="update.php">Update</a></button><br>
+        <button class="view"><a href="view.php">View</a></button><br>
+        <button class="logout"><a href="adlogout.php">Logout</a></button>
+    </div>
 </body>
 
 </html>
