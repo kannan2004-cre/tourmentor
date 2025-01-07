@@ -34,14 +34,30 @@ $result = mysqli_query($conn, $query);
 </div>
 
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+
     .page-content {
-        max-width: 600px;
-        margin: 20px auto;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        border-radius: 8px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     form {
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
 
     label {
@@ -50,16 +66,34 @@ $result = mysqli_query($conn, $query);
 
     input, textarea, select, button {
         margin-bottom: 15px;
-        padding: 8px;
+        padding: 12px;
         font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     button {
         color: white;
+        background-color: #007BFF;
         border: none;
-        padding: 10px;
+        padding: 12px;
         border-radius: 5px;
         cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+        .page-content {
+            padding: 15px;
+        }
+
+        input, textarea, select, button {
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+    }
 </style>

@@ -213,7 +213,7 @@ $hotels_result = $conn->query($hotels_sql);
                                 <td><?php echo htmlspecialchars($destination['destination']); ?></td>
                                 <td><?php echo htmlspecialchars($destination['description']); ?></td>
                                 <td><?php echo htmlspecialchars($destination['price']); ?></td>
-                                <td><img src="uploads/<?php echo htmlspecialchars($destination['filename']); ?>" alt="Destination Image"></td>
+                                <td><img src="image/<?php echo htmlspecialchars($destination['filename']); ?>" alt="Destination Image" onerror="this.onerror=null; this.src='uploads/default_image.jpg';"></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -246,7 +246,7 @@ $hotels_result = $conn->query($hotels_sql);
                                 <td><?php echo htmlspecialchars($hotel['address']); ?></td>
                                 <td><?php echo htmlspecialchars($hotel['price_per_night']); ?></td>
                                 <td><?php echo htmlspecialchars($hotel['rating']); ?></td>
-                                <td><img src="uploads/<?php echo htmlspecialchars($hotel['picture_url']); ?>" alt="Hotel Image"></td>
+                                <td><img src="himages/<?php echo htmlspecialchars(basename($hotel['picture_url'])); ?>" alt="Hotel Image" onerror="this.onerror=null; this.src='uploads/default_image.jpg';"></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>

@@ -2,7 +2,6 @@
 include('header.php');
 
 // Start the session
-session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_email'])) {
@@ -161,6 +160,7 @@ $conn->close();
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             display: flex;
+            flex-direction: column;
             gap: 20px;
             transition: transform 0.3s ease;
         }
@@ -168,8 +168,8 @@ $conn->close();
             transform: scale(1.02);
         }
         .hotel-image {
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            height: 200px;
             border-radius: 10px;
             object-fit: cover;
         }
@@ -196,8 +196,8 @@ $conn->close();
         }
         .hotel-actions {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
         }
         .hotel-actions a {
             background-color: #cf1313;
@@ -212,6 +212,20 @@ $conn->close();
             background-color: #ffa600;
             border-color: #ffa600;
             color: black;
+        }
+
+        @media (min-width: 768px) {
+            .hotel-card {
+                flex-direction: row;
+            }
+            .hotel-image {
+                width: 120px;
+                height: 120px;
+            }
+            .hotel-actions {
+                flex-direction: column;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>

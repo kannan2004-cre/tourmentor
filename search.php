@@ -327,7 +327,7 @@
                         echo "<div class='hotel-item-content'>";
                         echo "<h2>" . $row['name'] . "</h2>";
                         echo "<p><strong>Address:</strong> " . $row['address'] . "</p>";
-                        echo "<p class='price'>Price per night: $" . $row['price_per_night'] . "</p>";
+                        echo "<p class='price'>Price per night: ₹" . $row['price_per_night'] . "</p>";
                         echo "<p><strong>Rating:</strong> " . $row['rating'] . "/5</p>";
                         echo "<a href='booking.php?hotel_id=" . $row['id'] . "' class='book-link'>Book Now</a>";
                         echo "</div>";

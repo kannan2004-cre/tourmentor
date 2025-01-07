@@ -2,6 +2,7 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
 $isLoggedIn = isset($_SESSION['user_email']);
 ?>
 <!DOCTYPE html>

@@ -40,16 +40,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Allow certain file formats
     if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif" ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+    && $imageFileType != "gif" && $imageFileType != "webp") {
+        echo "Sorry, only JPG , JPEG , PNG , WEBP & GIF files are allowed.";
         $uploadOk = 0;
     }
 
     // If everything is ok, try to upload file
     if ($uploadOk == 1) {
-        if (move_uploaded_file($_FILES["hotel_image"]["tmp_name"], $target_file)) {
-            echo "The file ". htmlspecialchars( basename( $_FILES["hotel_image"]["name"])). " has been uploaded.";
-            
+        if (move_uploaded_file($_FILES["hotel_image"]["tmp_name"], $target_file)) {            
             // Insert into hotels table
             $sql = "INSERT INTO hotels (name, address, price_per_night, rating, picture_url) 
                     VALUES ('$name', '$address', $price, $rating, '$target_file')";
@@ -73,12 +71,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         VALUES ($hotel_id, '$attractions_info')";
                 mysqli_query($conn, $sql);
 
-                echo "<p>Hotel added successfully!</p>";
+                echo "<script>alert('Hotel added successfully!')</script>";
             } else {
                 echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
         } else {
-            echo "Sorry, there was an error uploading your file.";
+            echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
         }
     }
 }
