@@ -1,6 +1,5 @@
 <?php
 include('header.php');
-session_start();
 
 if (!isset($_SESSION['user_email'])) {
     header("Location: login.php");
@@ -65,13 +64,14 @@ $conn->close();
         }
 
         .cancel-container {
-            width: 80%;
+            width: 90%;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             margin: 40px auto;
-            padding: 20px;
+            padding: 60px;
             background-color: #fff;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -90,12 +90,13 @@ $conn->close();
             margin: 10px 0;
         }
 
-        .cancel-container a{
-            width: 300px;
+        .cancel-container a {
+            width: 100%;
+            max-width: 300px;
             height: 40px;
         }
 
-        .cancel-container a , button {
+        .cancel-container a, .cancel-container button {
             background-color: #cf1313;
             border: 1px solid #cf1313;
             color: white;
@@ -105,20 +106,111 @@ $conn->close();
             border-radius: 5px;
             text-decoration: none;
             font-size: 16px;
+            width: 100%;
+            max-width: 300px;
         }
 
-        .cancel-container a:hover , button:hover{
+        .cancel-container a:hover, .cancel-container button:hover {
             transition: 0.3s ease-in-out;
             background-color: #ffa600;
             color: black;
         }
+
+        .popup {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .popup-content input {
+            margin-top: 10px;
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .popup-content button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #cf1313;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .popup-content button:hover {
+            background-color: #ffa600;
+            color: black;
+        }
+
+        @media (max-width: 768px) {
+            .cancel-container {
+                width: 85%;
+                padding: 35px;
+            }
+
+            .cancel-container h1 {
+                font-size: 24px;
+            }
+
+            .cancel-container p {
+                font-size: 16px;
+            }
+
+            .cancel-container a, .cancel-container button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .popup-content {
+                padding: 15px;
+            }
+
+            .popup-content button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
     </style>
     <script>
         function confirmCancellation() {
-            var userInput = prompt("Please enter the following text to confirm cancellation: <?php echo $random_text; ?>");
-            if (userInput !== null) {
+            document.getElementById('popup').style.display = 'flex';
+        }
+
+        function submitCancellation() {
+            var userInput = document.getElementById('popupInput').value;
+            if (userInput !== '') {
                 document.getElementById('confirmation_text').value = userInput;
                 document.getElementById('cancelForm').submit();
+            }
+        }
+
+        // Close popup when clicking outside of the popup content
+        window.onclick = function(event) {
+            var popup = document.getElementById('popup');
+            if (event.target == popup) {
+                popup.style.display = 'none';
             }
         }
     </script>
@@ -133,6 +225,14 @@ $conn->close();
             <button type="button" onclick="confirmCancellation()">Confirm Cancellation</button>
         </form>
         <a href="profile.php">Back to Profile</a>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <p>Please enter the following text to confirm cancellation: <?php echo $random_text; ?></p>
+            <input type="text" id="popupInput">
+            <button type="button" onclick="submitCancellation()">Submit</button>
+        </div>
     </div>
 
     <?php include('footer.php'); ?>
