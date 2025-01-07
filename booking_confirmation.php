@@ -83,6 +83,7 @@ if (!$booking) {
                 <p>Check-out Date: <span><?php echo htmlspecialchars($booking['check_out']); ?></span></p>
             </div>
             <p>Your booking has been confirmed. We look forward to hosting you!</p>
+            <button><a href="profile.php">Check on profile</a></button>
         </div>
     </div>
 </body>

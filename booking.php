@@ -196,7 +196,7 @@
                 'Indira Gandhi Zoological Park',
                 'Yarada Beach'
             ],
-            'Tirupati': [
+            'Chittoor': [
                 'Tirumala Venkateswara Temple',
                 'Sri Kapileswara Swamy Temple',
                 'Sri Govindarajaswami Temple',
