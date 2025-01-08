@@ -34,7 +34,6 @@ if (isset($_POST['submit'])) {
 
 			// Move uploaded file
 			if (!move_uploaded_file($tempname, $folder)) {
-				echo "<script>alert('Failed to upload profile picture. Registration will continue without picture.');</script>";
 				$filename = null;
 			}
 		}
